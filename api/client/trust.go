@@ -68,7 +68,7 @@ func setupTrustedFlag(verify bool) (bool, string) {
 	}
 	message := "Skip image signing"
 	if verify {
-		message = "Skip image verification"
+		message = "跳过镜像验证"
 	}
 	return trusted, message
 }

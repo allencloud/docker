@@ -41,7 +41,7 @@ func main() {
 		flag.CommandLine.SetOutput(stdout)
 		flag.PrintDefaults()
 
-		help := "\nCommands:\n"
+		help := "\n命令:\n"
 
 		dockerCommands := append(cli.DockerCommandUsage, cobraAdaptor.Usage()...)
 		for _, cmd := range sortCommands(dockerCommands) {

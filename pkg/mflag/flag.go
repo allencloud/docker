@@ -1049,7 +1049,7 @@ func (fs *FlagSet) parseOne() (bool, string, error) {
 			value, fs.args = fs.args[0], fs.args[1:]
 		}
 		if !hasValue {
-			return false, "", fs.failf("flag needs an argument: -%s", name)
+			return false, "", fs.failf("命令行需要一个参数: -%s", name)
 		}
 		if err := flag.Value.Set(value); err != nil {
 			return false, "", fs.failf("invalid value %q for flag -%s: %v", value, name, err)
