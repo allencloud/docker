@@ -15,7 +15,7 @@ import (
 func newEnableCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enable PLUGIN",
-		Short: "Enable a plugin",
+		Short: "启用指定插件",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runEnable(dockerCli, args[0])
@@ -35,7 +35,7 @@ func runEnable(dockerCli *client.DockerCli, name string) error {
 	}
 	ref, ok := named.(reference.NamedTagged)
 	if !ok {
-		return fmt.Errorf("invalid name: %s", named.String())
+		return fmt.Errorf("无效名称: %s", named.String())
 	}
 	if err := dockerCli.Client().PluginEnable(context.Background(), ref.String()); err != nil {
 		return err

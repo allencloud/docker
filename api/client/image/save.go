@@ -22,7 +22,7 @@ func NewSaveCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "save [OPTIONS] IMAGE [IMAGE...]",
-		Short: "Save one or more images to a tar archive (streamed to STDOUT by default)",
+		Short: "将一个或多个镜像保存至压缩包(默认情况下流传输至标准输出)",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.images = args
@@ -32,14 +32,14 @@ func NewSaveCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.StringVarP(&opts.output, "output", "o", "", "Write to a file, instead of STDOUT")
+	flags.StringVarP(&opts.output, "output", "o", "", "写入一个文件，而不是标准输出")
 
 	return cmd
 }
 
 func runSave(dockerCli *client.DockerCli, opts saveOptions) error {
 	if opts.output == "" && dockerCli.IsTerminalOut() {
-		return errors.New("Cowardly refusing to save to a terminal. Use the -o flag or redirect.")
+		return errors.New("终端拒绝保存输出内容，请您使用 -o 参数或者重定向。")
 	}
 
 	responseBody, err := dockerCli.Client().ImageSave(context.Background(), opts.images)

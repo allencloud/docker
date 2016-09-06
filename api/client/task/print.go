@@ -48,7 +48,7 @@ func Print(dockerCli *client.DockerCli, ctx context.Context, tasks []swarm.Task,
 
 	// Ignore flushing errors
 	defer writer.Flush()
-	fmt.Fprintln(writer, strings.Join([]string{"ID", "NAME", "IMAGE", "NODE", "DESIRED STATE", "CURRENT STATE", "ERROR"}, "\t"))
+	fmt.Fprintln(writer, strings.Join([]string{"ID", "名称", "镜像", "节点", "预期状态", "实际状态", "错误"}, "\t"))
 
 	prevName := ""
 	for _, task := range tasks {

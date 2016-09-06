@@ -32,7 +32,7 @@ func newDeployCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "deploy [OPTIONS] STACK",
 		Aliases: []string{"up"},
-		Short:   "Create and update a stack from a Distributed Application Bundle (DAB)",
+		Short:   "从一个应用描述bundle（dab文件）中创建和更新一个stack",
 		Args:    cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.namespace = args[0]
@@ -107,7 +107,7 @@ func updateNetworks(
 		if _, exists := existingNetworkMap[name]; exists {
 			continue
 		}
-		fmt.Fprintf(dockerCli.Out(), "Creating network %s\n", name)
+		fmt.Fprintf(dockerCli.Out(), "创建网络 %s\n", name)
 		if _, err := client.NetworkCreate(ctx, name, createOpts); err != nil {
 			return err
 		}
@@ -195,7 +195,7 @@ func deployServices(
 		}
 
 		if service, exists := existingServiceMap[name]; exists {
-			fmt.Fprintf(out, "Updating service %s (id: %s)\n", name, service.ID)
+			fmt.Fprintf(out, "更新服务 %s (id: %s)\n", name, service.ID)
 
 			updateOpts := types.ServiceUpdateOptions{}
 			if sendAuth {
@@ -211,7 +211,7 @@ func deployServices(
 				return err
 			}
 		} else {
-			fmt.Fprintf(out, "Creating service %s\n", name)
+			fmt.Fprintf(out, "创建服务 %s\n", name)
 
 			createOpts := types.ServiceCreateOptions{}
 			if sendAuth {

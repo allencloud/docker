@@ -14,7 +14,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	return &cobra.Command{
 		Use:     "rm VOLUME [VOLUME...]",
 		Aliases: []string{"remove"},
-		Short:   "Remove one or more volumes",
+		Short:   "删除一个或多个存储卷",
 		Long:    removeDescription,
 		Example: removeExample,
 		Args:    cli.RequiresMinArgs(1),

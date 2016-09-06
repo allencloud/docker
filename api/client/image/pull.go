@@ -24,7 +24,7 @@ func NewPullCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "pull [OPTIONS] NAME[:TAG|@DIGEST]",
-		Short: "Pull an image or a repository from a registry",
+		Short: "从一个镜像仓库下拉一个镜像",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.remote = args[0]
@@ -34,7 +34,7 @@ func NewPullCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.BoolVarP(&opts.all, "all-tags", "a", false, "Download all tagged images in the repository")
+	flags.BoolVarP(&opts.all, "all-tags", "a", false, "从镜像仓库中下拉所有标签的镜像")
 	client.AddTrustedFlags(flags, true)
 
 	return cmd
@@ -46,12 +46,12 @@ func runPull(dockerCli *client.DockerCli, opts pullOptions) error {
 		return err
 	}
 	if opts.all && !reference.IsNameOnly(distributionRef) {
-		return errors.New("tag can't be used with --all-tags/-a")
+		return errors.New("标签不能使用 --all-tags/-a")
 	}
 
 	if !opts.all && reference.IsNameOnly(distributionRef) {
 		distributionRef = reference.WithDefaultTag(distributionRef)
-		fmt.Fprintf(dockerCli.Out(), "Using default tag: %s\n", reference.DefaultTag)
+		fmt.Fprintf(dockerCli.Out(), "使用默认标签: %s\n", reference.DefaultTag)
 	}
 
 	var tag string

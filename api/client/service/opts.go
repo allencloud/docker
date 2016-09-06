@@ -203,7 +203,7 @@ func (m *MountOpt) Set(value string) error {
 		case "readonly", "ro":
 			mount.ReadOnly, err = strconv.ParseBool(value)
 			if err != nil {
-				return fmt.Errorf("invalid value for %s: %s", key, value)
+				return fmt.Errorf("无效值 %s: %s", key, value)
 			}
 		case "bind-propagation":
 			bindOptions().Propagation = swarm.MountPropagation(strings.ToLower(value))
@@ -227,22 +227,22 @@ func (m *MountOpt) Set(value string) error {
 	}
 
 	if mount.Type == "" {
-		return fmt.Errorf("type is required")
+		return fmt.Errorf("挂载类型不能为空")
 	}
 
 	if mount.Target == "" {
-		return fmt.Errorf("target is required")
+		return fmt.Errorf("挂载目的地址不能为空")
 	}
 
 	if mount.VolumeOptions != nil && mount.Source == "" {
-		return fmt.Errorf("source is required when specifying volume-* options")
+		return fmt.Errorf("当指定选项 volume-* 时，挂载的源地址不能为空")
 	}
 
 	if mount.Type == swarm.MountTypeBind && mount.VolumeOptions != nil {
-		return fmt.Errorf("cannot mix 'volume-*' options with mount type '%s'", swarm.MountTypeBind)
+		return fmt.Errorf("不能将 'volume-*' 选项和挂载类型 '%s' 混用", swarm.MountTypeBind)
 	}
 	if mount.Type == swarm.MountTypeVolume && mount.BindOptions != nil {
-		return fmt.Errorf("cannot mix 'bind-*' options with mount type '%s'", swarm.MountTypeVolume)
+		return fmt.Errorf("不能将 'bind-*' 选项和挂载类型 '%s' 混用", swarm.MountTypeVolume)
 	}
 
 	m.values = append(m.values, mount)
@@ -383,7 +383,7 @@ func ValidatePort(value string) (string, error) {
 	portMappings, err := nat.ParsePortSpec(value)
 	for _, portMapping := range portMappings {
 		if portMapping.Binding.HostIP != "" {
-			return "", fmt.Errorf("HostIP is not supported by a service.")
+			return "", fmt.Errorf("服务不支持宿主机IP.")
 		}
 	}
 	return value, err
@@ -468,7 +468,7 @@ func (opts *serviceOptions) ToService() (swarm.ServiceSpec, error) {
 	switch opts.mode {
 	case "global":
 		if opts.replicas.Value() != nil {
-			return service, fmt.Errorf("replicas can only be used with replicated mode")
+			return service, fmt.Errorf("副本数(replicas)只能被使用于副本(replicated)模式")
 		}
 
 		service.Mode.Global = &swarm.GlobalService{}
@@ -477,7 +477,7 @@ func (opts *serviceOptions) ToService() (swarm.ServiceSpec, error) {
 			Replicas: opts.replicas.Value(),
 		}
 	default:
-		return service, fmt.Errorf("Unknown mode: %s", opts.mode)
+		return service, fmt.Errorf("未知的服务模式: %s", opts.mode)
 	}
 	return service, nil
 }
@@ -486,34 +486,34 @@ func (opts *serviceOptions) ToService() (swarm.ServiceSpec, error) {
 // Any flags that are not common are added separately in the individual command
 func addServiceFlags(cmd *cobra.Command, opts *serviceOptions) {
 	flags := cmd.Flags()
-	flags.StringVar(&opts.name, flagName, "", "Service name")
+	flags.StringVar(&opts.name, flagName, "", "服务名")
 
-	flags.StringVarP(&opts.workdir, "workdir", "w", "", "Working directory inside the container")
-	flags.StringVarP(&opts.user, flagUser, "u", "", "Username or UID")
+	flags.StringVarP(&opts.workdir, "workdir", "w", "", "容器内部的工作目录")
+	flags.StringVarP(&opts.user, flagUser, "u", "", "用户名UID (格式: <用户名|用户名ID>[:<组|组ID>])")
 
-	flags.Var(&opts.resources.limitCPU, flagLimitCPU, "Limit CPUs")
-	flags.Var(&opts.resources.limitMemBytes, flagLimitMemory, "Limit Memory")
-	flags.Var(&opts.resources.resCPU, flagReserveCPU, "Reserve CPUs")
-	flags.Var(&opts.resources.resMemBytes, flagReserveMemory, "Reserve Memory")
-	flags.Var(&opts.stopGrace, flagStopGracePeriod, "Time to wait before force killing a container")
+	flags.Var(&opts.resources.limitCPU, flagLimitCPU, "限制CPU使用量")
+	flags.Var(&opts.resources.limitMemBytes, flagLimitMemory, "限制内存使用量")
+	flags.Var(&opts.resources.resCPU, flagReserveCPU, "预留CPU使用量")
+	flags.Var(&opts.resources.resMemBytes, flagReserveMemory, "预留内存使用量")
+	flags.Var(&opts.stopGrace, flagStopGracePeriod, "强制终止容器前的等待时间")
 
-	flags.Var(&opts.replicas, flagReplicas, "Number of tasks")
+	flags.Var(&opts.replicas, flagReplicas, "服务内任务数量")
 
-	flags.StringVar(&opts.restartPolicy.condition, flagRestartCondition, "", "Restart when condition is met (none, on-failure, or any)")
-	flags.Var(&opts.restartPolicy.delay, flagRestartDelay, "Delay between restart attempts")
-	flags.Var(&opts.restartPolicy.maxAttempts, flagRestartMaxAttempts, "Maximum number of restarts before giving up")
-	flags.Var(&opts.restartPolicy.window, flagRestartWindow, "Window used to evaluate the restart policy")
+	flags.StringVar(&opts.restartPolicy.condition, flagRestartCondition, "", "条件满足时的重启策略:none(无), on-failure(失败时重启), 或者其他)")
+	flags.Var(&opts.restartPolicy.delay, flagRestartDelay, "两次重启之间的延时")
+	flags.Var(&opts.restartPolicy.maxAttempts, flagRestartMaxAttempts, "放弃重启前的最大次数")
+	flags.Var(&opts.restartPolicy.window, flagRestartWindow, "评估重启策略的窗口时间")
 
-	flags.Uint64Var(&opts.update.parallelism, flagUpdateParallelism, 1, "Maximum number of tasks updated simultaneously (0 to update all at once)")
-	flags.DurationVar(&opts.update.delay, flagUpdateDelay, time.Duration(0), "Delay between updates")
-	flags.StringVar(&opts.update.onFailure, flagUpdateFailureAction, "pause", "Action on update failure (pause|continue)")
+	flags.Uint64Var(&opts.update.parallelism, flagUpdateParallelism, 1, "并发更新任务时的最大数量(0代表立即更新所有任务)")
+	flags.DurationVar(&opts.update.delay, flagUpdateDelay, time.Duration(0), "两次更新之间的延时")
+	flags.StringVar(&opts.update.onFailure, flagUpdateFailureAction, "pause", "更新失败时的策略: pause(暂停)|continue(继续)")
 
-	flags.StringVar(&opts.endpoint.mode, flagEndpointMode, "", "Endpoint mode (vip or dnsrr)")
+	flags.StringVar(&opts.endpoint.mode, flagEndpointMode, "", "网络模式: vip(虚拟IP)|dnsrr(DNS轮询)")
 
-	flags.BoolVar(&opts.registryAuth, flagRegistryAuth, false, "Send registry authentication details to swarm agents")
+	flags.BoolVar(&opts.registryAuth, flagRegistryAuth, false, "向Swarm集群中节点上的代理模块发送注册认证信息")
 
-	flags.StringVar(&opts.logDriver.name, flagLogDriver, "", "Logging driver for service")
-	flags.Var(&opts.logDriver.opts, flagLogOpt, "Logging driver options")
+	flags.StringVar(&opts.logDriver.name, flagLogDriver, "", "服务的日志驱动")
+	flags.Var(&opts.logDriver.opts, flagLogOpt, "日志驱动选项")
 }
 
 const (

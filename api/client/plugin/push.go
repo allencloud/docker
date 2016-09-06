@@ -17,7 +17,7 @@ import (
 func newPushCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "push PLUGIN",
-		Short: "Push a plugin",
+		Short: "上传插件",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runPush(dockerCli, args[0])
@@ -36,7 +36,7 @@ func runPush(dockerCli *client.DockerCli, name string) error {
 	}
 	ref, ok := named.(reference.NamedTagged)
 	if !ok {
-		return fmt.Errorf("invalid name: %s", named.String())
+		return fmt.Errorf("无效名称: %s", named.String())
 	}
 
 	ctx := context.Background()

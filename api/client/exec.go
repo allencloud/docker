@@ -18,7 +18,7 @@ import (
 // Usage: docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
 func (cli *DockerCli) CmdExec(args ...string) error {
 	cmd := Cli.Subcmd("exec", []string{"[OPTIONS] CONTAINER COMMAND [ARG...]"}, Cli.DockerCommands["exec"].Description, true)
-	detachKeys := cmd.String([]string{"-detach-keys"}, "", "Override the key sequence for detaching a container")
+	detachKeys := cmd.String([]string{"-detach-keys"}, "", "覆盖从容器停止附加的退出键顺序")
 
 	execConfig, err := ParseExec(cmd, args)
 	container := cmd.Arg(0)
@@ -43,7 +43,7 @@ func (cli *DockerCli) CmdExec(args ...string) error {
 
 	execID := response.ID
 	if execID == "" {
-		fmt.Fprintf(cli.out, "exec ID empty")
+		fmt.Fprintf(cli.out, "exec ID为空")
 		return nil
 	}
 
@@ -125,11 +125,11 @@ func (cli *DockerCli) CmdExec(args ...string) error {
 // not valid, it will return an error.
 func ParseExec(cmd *flag.FlagSet, args []string) (*types.ExecConfig, error) {
 	var (
-		flStdin      = cmd.Bool([]string{"i", "-interactive"}, false, "Keep STDIN open even if not attached")
-		flTty        = cmd.Bool([]string{"t", "-tty"}, false, "Allocate a pseudo-TTY")
-		flDetach     = cmd.Bool([]string{"d", "-detach"}, false, "Detached mode: run command in the background")
-		flUser       = cmd.String([]string{"u", "-user"}, "", "Username or UID (format: <name|uid>[:<group|gid>])")
-		flPrivileged = cmd.Bool([]string{"-privileged"}, false, "Give extended privileges to the command")
+		flStdin      = cmd.Bool([]string{"i", "-interactive"}, false, "即使容器没有被附加标准输出，标准错误，也爆出输出输入的畅通")
+		flTty        = cmd.Bool([]string{"t", "-tty"}, false, "分配一个伪终端")
+		flDetach     = cmd.Bool([]string{"d", "-detach"}, false, "后台模式: 在后台运行用户指定的命令")
+		flUser       = cmd.String([]string{"u", "-user"}, "", "用户名或用户名ID (格式: <用户名|用户名ID>[:<组|组ID>])")
+		flPrivileged = cmd.Bool([]string{"-privileged"}, false, "为运行命令授予格外的特权")
 		execCmd      []string
 	)
 	cmd.Require(flag.Min, 2)

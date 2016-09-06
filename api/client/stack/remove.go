@@ -22,7 +22,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rm STACK",
 		Aliases: []string{"remove", "down"},
-		Short:   "Remove the stack",
+		Short:   "删除stack",
 		Args:    cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.namespace = args[0]
@@ -44,10 +44,10 @@ func runRemove(dockerCli *client.DockerCli, opts removeOptions) error {
 		return err
 	}
 	for _, service := range services {
-		fmt.Fprintf(stderr, "Removing service %s\n", service.Spec.Name)
+		fmt.Fprintf(stderr, "删除服务 %s\n", service.Spec.Name)
 		if err := client.ServiceRemove(ctx, service.ID); err != nil {
 			hasError = true
-			fmt.Fprintf(stderr, "Failed to remove service %s: %s", service.ID, err)
+			fmt.Fprintf(stderr, "删除服务 %s 失败: %s", service.ID, err)
 		}
 	}
 
@@ -56,10 +56,10 @@ func runRemove(dockerCli *client.DockerCli, opts removeOptions) error {
 		return err
 	}
 	for _, network := range networks {
-		fmt.Fprintf(stderr, "Removing network %s\n", network.Name)
+		fmt.Fprintf(stderr, "删除网络 %s\n", network.Name)
 		if err := client.NetworkRemove(ctx, network.ID); err != nil {
 			hasError = true
-			fmt.Fprintf(stderr, "Failed to remove network %s: %s", network.ID, err)
+			fmt.Fprintf(stderr, "删除网络 %s 失败: %s", network.ID, err)
 		}
 	}
 
@@ -69,7 +69,7 @@ func runRemove(dockerCli *client.DockerCli, opts removeOptions) error {
 	}
 
 	if hasError {
-		return fmt.Errorf("Failed to remove some resources")
+		return fmt.Errorf("删除部分资源失败")
 	}
 	return nil
 }

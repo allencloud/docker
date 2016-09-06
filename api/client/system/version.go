@@ -16,22 +16,21 @@ import (
 )
 
 var versionTemplate = `Client:
- Version:      {{.Client.Version}}
- API version:  {{.Client.APIVersion}}
- Go version:   {{.Client.GoVersion}}
- Git commit:   {{.Client.GitCommit}}
- Built:        {{.Client.BuildTime}}
- OS/Arch:      {{.Client.Os}}/{{.Client.Arch}}{{if .Client.Experimental}}
- Experimental: {{.Client.Experimental}}{{end}}{{if .ServerOK}}
-
+ 版本:      {{.Client.Version}}
+ API版本:  {{.Client.APIVersion}}
+ Go 版本:   {{.Client.GoVersion}}
+ Git提交号:   {{.Client.GitCommit}}
+ 构建:        {{.Client.BuildTime}}
+ 操作系统/架构:      {{.Client.Os}}/{{.Client.Arch}}{{if .Client.Experimental}}
+ 试验版: {{.Client.Experimental}}{{end}}{{if .ServerOK}}
 Server:
- Version:      {{.Server.Version}}
- API version:  {{.Server.APIVersion}}
- Go version:   {{.Server.GoVersion}}
- Git commit:   {{.Server.GitCommit}}
- Built:        {{.Server.BuildTime}}
- OS/Arch:      {{.Server.Os}}/{{.Server.Arch}}{{if .Server.Experimental}}
- Experimental: {{.Server.Experimental}}{{end}}{{end}}`
+ 版本:      {{.Server.Version}}
+ API 版本:  {{.Server.APIVersion}}
+ Go 版本:   {{.Server.GoVersion}}
+ Git提交号:   {{.Server.GitCommit}}
+ 构建:        {{.Server.BuildTime}}
+ 操作系统/架构:      {{.Server.Os}}/{{.Server.Arch}}{{if .Server.Experimental}}
+ 试验版: {{.Server.Experimental}}{{end}}{{end}}`
 
 type versionOptions struct {
 	format string
@@ -43,7 +42,7 @@ func NewVersionCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "version [OPTIONS]",
-		Short: "Show the Docker version information",
+		Short: "显示Docker的版本信息",
 		Args:  cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runVersion(dockerCli, &opts)
@@ -52,7 +51,7 @@ func NewVersionCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.StringVarP(&opts.format, "format", "f", "", "Format the output using the given go template")
+	flags.StringVarP(&opts.format, "format", "f", "", "基于指定的Go语言模板格式化命令输出内容")
 
 	return cmd
 }

@@ -14,7 +14,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	return &cobra.Command{
 		Use:     "rm NETWORK [NETWORK...]",
 		Aliases: []string{"remove"},
-		Short:   "Remove one or more networks",
+		Short:   "删除一个或多个网络",
 		Args:    cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runRemove(dockerCli, args)

@@ -41,7 +41,7 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create [OPTIONS] NETWORK",
-		Short: "Create a network",
+		Short: "创建一个网络",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.name = args[0]
@@ -50,19 +50,19 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.driver, "driver", "d", "bridge", "Driver to manage the Network")
-	flags.VarP(&opts.driverOpts, "opt", "o", "Set driver specific options")
-	flags.StringSliceVar(&opts.labels, "label", []string{}, "Set metadata on a network")
-	flags.BoolVar(&opts.internal, "internal", false, "Restrict external access to the network")
-	flags.BoolVar(&opts.ipv6, "ipv6", false, "Enable IPv6 networking")
+	flags.StringVarP(&opts.driver, "driver", "d", "bridge", "管理网络所使用的网络驱动")
+	flags.VarP(&opts.driverOpts, "opt", "o", "设置指定驱动的选项")
+	flags.StringSliceVar(&opts.labels, "label", []string{}, "在一个网络设置元数据")
+	flags.BoolVar(&opts.internal, "internal", false, "限制外界对网络的访问能力")
+	flags.BoolVar(&opts.ipv6, "ipv6", false, "启用 IPv6 网络")
 
-	flags.StringVar(&opts.ipamDriver, "ipam-driver", "default", "IP Address Management Driver")
-	flags.StringSliceVar(&opts.ipamSubnet, "subnet", []string{}, "Subnet in CIDR format that represents a network segment")
-	flags.StringSliceVar(&opts.ipamIPRange, "ip-range", []string{}, "Allocate container ip from a sub-range")
-	flags.StringSliceVar(&opts.ipamGateway, "gateway", []string{}, "IPv4 or IPv6 Gateway for the master subnet")
+	flags.StringVar(&opts.ipamDriver, "ipam-driver", "default", "IP地址管理驱动")
+	flags.StringSliceVar(&opts.ipamSubnet, "subnet", []string{}, "CIDR格式的子网信息，代表一个网络段")
+	flags.StringSliceVar(&opts.ipamIPRange, "ip-range", []string{}, "从一个子网范围内分配容器IP")
+	flags.StringSliceVar(&opts.ipamGateway, "gateway", []string{}, "为主子网设置的IPv4或IPv6网关")
 
-	flags.Var(&opts.ipamAux, "aux-address", "Auxiliary IPv4 or IPv6 addresses used by Network driver")
-	flags.Var(&opts.ipamOpt, "ipam-opt", "Set IPAM driver specific options")
+	flags.Var(&opts.ipamAux, "aux-address", "被网络驱动使用的辅助IPv4或IPv6地址")
+	flags.Var(&opts.ipamOpt, "ipam-opt", "设置IP地址管理器的特定参数")
 
 	return cmd
 }
@@ -105,7 +105,7 @@ func runCreate(dockerCli *client.DockerCli, opts createOptions) error {
 // structured ipam data.
 func consolidateIpam(subnets, ranges, gateways []string, auxaddrs map[string]string) ([]network.IPAMConfig, error) {
 	if len(subnets) < len(ranges) || len(subnets) < len(gateways) {
-		return nil, fmt.Errorf("every ip-range or gateway must have a corresponding subnet")
+		return nil, fmt.Errorf("每一个IP范围或网关必须拥有一个相应的子网地址")
 	}
 	iData := map[string]*network.IPAMConfig{}
 
@@ -121,7 +121,7 @@ func consolidateIpam(subnets, ranges, gateways []string, auxaddrs map[string]str
 				return nil, err
 			}
 			if ok1 || ok2 {
-				return nil, fmt.Errorf("multiple overlapping subnet configuration is not supported")
+				return nil, fmt.Errorf("多个子网配置信息有重叠的情况，Docker引擎暂不支持")
 			}
 		}
 		iData[s] = &network.IPAMConfig{Subnet: s, AuxAddress: map[string]string{}}
@@ -139,14 +139,14 @@ func consolidateIpam(subnets, ranges, gateways []string, auxaddrs map[string]str
 				continue
 			}
 			if iData[s].IPRange != "" {
-				return nil, fmt.Errorf("cannot configure multiple ranges (%s, %s) on the same subnet (%s)", r, iData[s].IPRange, s)
+				return nil, fmt.Errorf("不能配置在同一个子网 (%s)中配置多范围(%s, %s)", s, r, iData[s].IPRange)
 			}
 			d := iData[s]
 			d.IPRange = r
 			match = true
 		}
 		if !match {
-			return nil, fmt.Errorf("no matching subnet for range %s", r)
+			return nil, fmt.Errorf("没有匹配的子网地址 %s", r)
 		}
 	}
 
@@ -162,14 +162,14 @@ func consolidateIpam(subnets, ranges, gateways []string, auxaddrs map[string]str
 				continue
 			}
 			if iData[s].Gateway != "" {
-				return nil, fmt.Errorf("cannot configure multiple gateways (%s, %s) for the same subnet (%s)", g, iData[s].Gateway, s)
+				return nil, fmt.Errorf("不能配置在同一个子网 (%s)中配置多个网关(%s, %s)", s, g, iData[s].Gateway)
 			}
 			d := iData[s]
 			d.Gateway = g
 			match = true
 		}
 		if !match {
-			return nil, fmt.Errorf("no matching subnet for gateway %s", g)
+			return nil, fmt.Errorf("没有匹配的子网地址 %s", g)
 		}
 	}
 
@@ -188,7 +188,7 @@ func consolidateIpam(subnets, ranges, gateways []string, auxaddrs map[string]str
 			match = true
 		}
 		if !match {
-			return nil, fmt.Errorf("no matching subnet for aux-address %s", aa)
+			return nil, fmt.Errorf("没有找到符合辅助网络地址的子网 %s", aa)
 		}
 	}
 
@@ -206,13 +206,13 @@ func subnetMatches(subnet, data string) (bool, error) {
 
 	_, s, err := net.ParseCIDR(subnet)
 	if err != nil {
-		return false, fmt.Errorf("Invalid subnet %s : %v", s, err)
+		return false, fmt.Errorf("无效的子网地址 %s : %v", s, err)
 	}
 
 	if strings.Contains(data, "/") {
 		ip, _, err = net.ParseCIDR(data)
 		if err != nil {
-			return false, fmt.Errorf("Invalid cidr %s : %v", data, err)
+			return false, fmt.Errorf("无效的 CIDR %s : %v", data, err)
 		}
 	} else {
 		ip = net.ParseIP(data)

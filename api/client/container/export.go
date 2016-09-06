@@ -22,7 +22,7 @@ func NewExportCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "export [OPTIONS] CONTAINER",
-		Short: "Export a container's filesystem as a tar archive",
+		Short: "以一个压缩包的形式导出一个容器的文件系统",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.container = args[0]
@@ -32,14 +32,14 @@ func NewExportCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.StringVarP(&opts.output, "output", "o", "", "Write to a file, instead of STDOUT")
+	flags.StringVarP(&opts.output, "output", "o", "", "写入一个本地文件，而不是标准输出STDOUT")
 
 	return cmd
 }
 
 func runExport(dockerCli *client.DockerCli, opts exportOptions) error {
 	if opts.output == "" && dockerCli.IsTerminalOut() {
-		return errors.New("Cowardly refusing to save to a terminal. Use the -o flag or redirect.")
+		return errors.New("终端拒绝保存导出内容，请使用 -o 参数或者重定向。")
 	}
 
 	clnt := dockerCli.Client()

@@ -16,7 +16,7 @@ import (
 func newSetCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set PLUGIN key1=value1 [key2=value2...]",
-		Short: "Change settings for a plugin",
+		Short: "为指定插件修改配置",
 		Args:  cli.RequiresMinArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runSet(dockerCli, args[0], args[1:])
@@ -36,7 +36,7 @@ func runSet(dockerCli *client.DockerCli, name string, args []string) error {
 	}
 	ref, ok := named.(reference.NamedTagged)
 	if !ok {
-		return fmt.Errorf("invalid name: %s", named.String())
+		return fmt.Errorf("无效名称: %s", named.String())
 	}
 	return dockerCli.Client().PluginSet(context.Background(), ref.String(), args)
 }

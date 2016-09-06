@@ -17,7 +17,7 @@ func newUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update [OPTIONS]",
-		Short: "Update the swarm",
+		Short: "更新Swarm集群",
 		Args:  cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runUpdate(dockerCli, cmd.Flags(), opts)
@@ -49,7 +49,7 @@ func runUpdate(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts swarmOpti
 		return err
 	}
 
-	fmt.Fprintln(dockerCli.Out(), "Swarm updated.")
+	fmt.Fprintln(dockerCli.Out(), "Swarm集群更新完毕。")
 
 	return nil
 }

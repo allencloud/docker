@@ -12,7 +12,7 @@ import (
 func newPromoteCommand(dockerCli *client.DockerCli) *cobra.Command {
 	return &cobra.Command{
 		Use:   "promote NODE [NODE...]",
-		Short: "Promote one or more nodes to manager in the swarm",
+		Short: "在Swarm集群中升级一个或多个到管理者角色",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runPromote(dockerCli, args)
@@ -26,7 +26,7 @@ func runPromote(dockerCli *client.DockerCli, nodes []string) error {
 		return nil
 	}
 	success := func(nodeID string) {
-		fmt.Fprintf(dockerCli.Out(), "Node %s promoted to a manager in the swarm.\n", nodeID)
+		fmt.Fprintf(dockerCli.Out(), "成功将Swarm集群中的节点 %s 升级到管理者角色。\n", nodeID)
 	}
 	return updateNodes(dockerCli, nodes, promote, success)
 }

@@ -8,10 +8,10 @@ type Command struct {
 
 // DockerCommandUsage lists the top level docker commands and their short usage
 var DockerCommandUsage = []Command{
-	{"exec", "Run a command in a running container"},
-	{"info", "Display system-wide information"},
-	{"inspect", "Return low-level information on a container, image or task"},
-	{"update", "Update configuration of one or more containers"},
+	{"exec", "在运行容器中运行指定命令"},
+	{"info", "显示Docker引擎系统级别的信息"},
+	{"inspect", "返回容器、镜像或任务的底层想相信信息"},
+	{"update", "更新一个或者多个容器的配置信息"},
 }
 
 // DockerCommands stores all the docker command

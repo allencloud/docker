@@ -17,5 +17,5 @@ func FlagErrorFunc(cmd *cobra.Command, err error) error {
 	if cmd.HasSubCommands() {
 		usage = "\n\n" + cmd.UsageString()
 	}
-	return fmt.Errorf("%s\nSee '%s --help'.%s", err, cmd.CommandPath(), usage)
+	return fmt.Errorf("%s\n查看 '%s --help'.%s", err, cmd.CommandPath(), usage)
 }

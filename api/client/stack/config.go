@@ -19,7 +19,7 @@ func newConfigCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config [OPTIONS] STACK",
-		Short: "Print the stack configuration",
+		Short: "打印stack的配置信息",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.namespace = args[0]

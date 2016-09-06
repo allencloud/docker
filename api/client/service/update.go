@@ -25,7 +25,7 @@ func newUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update [OPTIONS] SERVICE",
-		Short: "Update a service",
+		Short: "更新一个服务",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runUpdate(dockerCli, cmd.Flags(), args[0])
@@ -33,22 +33,21 @@ func newUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.String("image", "", "Service image tag")
-	flags.String("args", "", "Service command args")
+	flags.String("image", "", "服务镜像的标签")
+	flags.String("args", "", "服务的启动命令")
 	addServiceFlags(cmd, opts)
-
-	flags.Var(newListOptsVar(), flagEnvRemove, "Remove an environment variable")
-	flags.Var(newListOptsVar(), flagLabelRemove, "Remove a label by its key")
-	flags.Var(newListOptsVar(), flagContainerLabelRemove, "Remove a container label by its key")
-	flags.Var(newListOptsVar(), flagMountRemove, "Remove a mount by its target path")
-	flags.Var(newListOptsVar(), flagPublishRemove, "Remove a published port by its target port")
-	flags.Var(newListOptsVar(), flagConstraintRemove, "Remove a constraint")
-	flags.Var(&opts.labels, flagLabelAdd, "Add or update service labels")
-	flags.Var(&opts.containerLabels, flagContainerLabelAdd, "Add or update container labels")
-	flags.Var(&opts.env, flagEnvAdd, "Add or update environment variables")
-	flags.Var(&opts.mounts, flagMountAdd, "Add or update a mount on a service")
-	flags.StringSliceVar(&opts.constraints, flagConstraintAdd, []string{}, "Add or update placement constraints")
-	flags.Var(&opts.endpoint.ports, flagPublishAdd, "Add or update a published port")
+	flags.Var(newListOptsVar(), flagEnvRemove, "删除一个环境变量")
+	flags.Var(newListOptsVar(), flagLabelRemove, "通过键值删除一个标签")
+	flags.Var(newListOptsVar(), flagContainerLabelRemove, "通过键值删除一个容器的标签")
+	flags.Var(newListOptsVar(), flagMountRemove, "通过目标路径删除一个挂载")
+	flags.Var(newListOptsVar(), flagPublishRemove, "通过目标端口删除一个对外暴露的端口")
+	flags.Var(newListOptsVar(), flagConstraintRemove, "删除一条限制条件")
+	flags.Var(&opts.labels, flagLabelAdd, "添加或更新服务标签")
+	flags.Var(&opts.containerLabels, flagContainerLabelAdd, "添加或更新容器标签")
+	flags.Var(&opts.env, flagEnvAdd, "添加或更新环境变量")
+	flags.Var(&opts.mounts, flagMountAdd, "添加或更新一个服务的挂载项")
+	flags.StringSliceVar(&opts.constraints, flagConstraintAdd, []string{}, "添加或更新放置策略与限制")
+	flags.Var(&opts.endpoint.ports, flagPublishAdd, "添加或更新一个对外暴露的端口")
 	return cmd
 }
 

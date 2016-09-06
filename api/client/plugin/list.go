@@ -15,7 +15,7 @@ import (
 func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls",
-		Short:   "List plugins",
+		Short:   "罗列所有插件",
 		Aliases: []string{"list"},
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -33,7 +33,7 @@ func runList(dockerCli *client.DockerCli) error {
 	}
 
 	w := tabwriter.NewWriter(dockerCli.Out(), 20, 1, 3, ' ', 0)
-	fmt.Fprintf(w, "NAME \tTAG \tACTIVE")
+	fmt.Fprintf(w, "名称 \t标签 \t活跃状态")
 	fmt.Fprintf(w, "\n")
 
 	for _, p := range plugins {

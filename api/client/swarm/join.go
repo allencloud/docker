@@ -26,7 +26,7 @@ func newJoinCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "join [OPTIONS] HOST:PORT",
-		Short: "Join a swarm as a node and/or manager",
+		Short: "加入作为工作节点(worker)或者管理节点(manager)加入一个Swarm集群",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.remote = args[0]
@@ -35,9 +35,9 @@ func newJoinCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.Var(&opts.listenAddr, flagListenAddr, "Listen address (format: <ip|interface>[:port])")
-	flags.StringVar(&opts.advertiseAddr, flagAdvertiseAddr, "", "Advertised address (format: <ip|interface>[:port])")
-	flags.StringVar(&opts.token, flagToken, "", "Token for entry into the swarm")
+	flags.Var(&opts.listenAddr, flagListenAddr, "监听地址 (格式: <IP地址|网卡>[:端口])")
+	flags.StringVar(&opts.advertiseAddr, flagAdvertiseAddr, "", "广播地址 (格式: <IP地址|网卡>[:端口])")
+	flags.StringVar(&opts.token, flagToken, "", "进入此Swarm集群所需的令牌")
 	return cmd
 }
 
@@ -65,10 +65,10 @@ func runJoin(dockerCli *client.DockerCli, opts joinOptions) error {
 	if err != nil {
 		// TODO(aaronl): is there a better way to do this?
 		if strings.Contains(err.Error(), "This node is not a swarm manager.") {
-			fmt.Fprintln(dockerCli.Out(), "This node joined a swarm as a worker.")
+			fmt.Fprintln(dockerCli.Out(), "此节点已经作为一个工作节点(worker)加入指定的Swarm集群。")
 		}
 	} else {
-		fmt.Fprintln(dockerCli.Out(), "This node joined a swarm as a manager.")
+		fmt.Fprintln(dockerCli.Out(), "此节点已经作为一个管理节点(manager)加入指定的Swarm集群。")
 	}
 
 	return nil

@@ -33,7 +33,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
 		Aliases: []string{"list"},
-		Short:   "List volumes",
+		Short:   "罗列所有存储卷",
 		Long:    listDescription,
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -42,8 +42,8 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display volume names")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Provide filter values (i.e. 'dangling=true')")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示存储卷名称")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "提供过滤信息 (比如 'dangling=true')")
 
 	return cmd
 }

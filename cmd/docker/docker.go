@@ -20,8 +20,8 @@ import (
 var (
 	commonFlags = cliflags.InitCommonFlags()
 	clientFlags = initClientFlags(commonFlags)
-	flHelp      = flag.Bool([]string{"h", "-help"}, false, "Print usage")
-	flVersion   = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
+	flHelp      = flag.Bool([]string{"h", "-help"}, false, "打印用途")
+	flVersion   = flag.Bool([]string{"v", "-version"}, false, "打印版本信息并退出")
 )
 
 func main() {
@@ -35,8 +35,8 @@ func main() {
 	cobraAdaptor := cobraadaptor.NewCobraAdaptor(clientFlags)
 
 	flag.Usage = func() {
-		fmt.Fprint(stdout, "Usage: docker [OPTIONS] COMMAND [arg...]\n       docker [ --help | -v | --version ]\n\n")
-		fmt.Fprint(stdout, "A self-sufficient runtime for containers.\n\nOptions:\n")
+		fmt.Fprint(stdout, "用途: docker [OPTIONS] COMMAND [arg...]\n       docker [ --help | -v | --version ]\n\n")
+		fmt.Fprint(stdout, "一个为容器而生的运行时管理引擎.\n\n选项:\n")
 
 		flag.CommandLine.SetOutput(stdout)
 		flag.PrintDefaults()
@@ -48,7 +48,7 @@ func main() {
 			help += fmt.Sprintf("    %-10.10s%s\n", cmd.Name, cmd.Description)
 		}
 
-		help += "\nRun 'docker COMMAND --help' for more information on a command."
+		help += "\n运行 'docker COMMAND --help' 来获取命令的更多详细信息."
 		fmt.Fprintf(stdout, "%s\n", help)
 	}
 
@@ -88,16 +88,16 @@ func main() {
 
 func showVersion() {
 	if utils.ExperimentalBuild() {
-		fmt.Printf("Docker version %s, build %s, experimental\n", dockerversion.Version, dockerversion.GitCommit)
+		fmt.Printf("Docker引擎版本 %s, 构建 %s, 试验版\n", dockerversion.Version, dockerversion.GitCommit)
 	} else {
-		fmt.Printf("Docker version %s, build %s\n", dockerversion.Version, dockerversion.GitCommit)
+		fmt.Printf("Docker引擎版本 %s, 构建 %s\n", dockerversion.Version, dockerversion.GitCommit)
 	}
 }
 
 func initClientFlags(commonFlags *cliflags.CommonFlags) *cliflags.ClientFlags {
 	clientFlags := &cliflags.ClientFlags{FlagSet: new(flag.FlagSet), Common: commonFlags}
 	client := clientFlags.FlagSet
-	client.StringVar(&clientFlags.ConfigDir, []string{"-config"}, cliconfig.ConfigDir(), "Location of client config files")
+	client.StringVar(&clientFlags.ConfigDir, []string{"-config"}, cliconfig.ConfigDir(), "客户端配置文件路径")
 
 	clientFlags.PostParse = func() {
 		clientFlags.Common.PostParse()

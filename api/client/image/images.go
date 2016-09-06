@@ -28,7 +28,7 @@ func NewImagesCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "images [OPTIONS] [REPOSITORY[:TAG]]",
-		Short: "List images",
+		Short: "罗列所有镜像",
 		Args:  cli.RequiresMaxArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
@@ -40,12 +40,12 @@ func NewImagesCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only show numeric IDs")
-	flags.BoolVarP(&opts.all, "all", "a", false, "Show all images (default hides intermediate images)")
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Don't truncate output")
-	flags.BoolVar(&opts.showDigests, "digests", false, "Show digests")
-	flags.StringVar(&opts.format, "format", "", "Pretty-print images using a Go template")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Filter output based on conditions provided")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示数字ID")
+	flags.BoolVarP(&opts.all, "all", "a", false, "显示所有的镜像(默认情况隐藏中间镜像)")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断命令输出内容")
+	flags.BoolVar(&opts.showDigests, "digests", false, "显示验证信息")
+	flags.StringVar(&opts.format, "format", "", "使用一个Go语言模板打印镜像信息")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "基于指定条件过滤命令输出内容")
 
 	return cmd
 }

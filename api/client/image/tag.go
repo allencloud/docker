@@ -19,7 +19,7 @@ func NewTagCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "tag IMAGE[:TAG] IMAGE[:TAG]",
-		Short: "Tag an image into a repository",
+		Short: "为一个镜像添加一个标签",
 		Args:  cli.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.image = args[0]

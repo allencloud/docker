@@ -131,7 +131,7 @@ func parseExternalCA(caSpec string) (*swarm.ExternalCA, error) {
 		parts := strings.SplitN(field, "=", 2)
 
 		if len(parts) != 2 {
-			return nil, fmt.Errorf("invalid field '%s' must be a key=value pair", field)
+			return nil, fmt.Errorf("无效的属性 '%s' 必须是一个键值对", field)
 		}
 
 		key, value := parts[0], parts[1]
@@ -142,7 +142,7 @@ func parseExternalCA(caSpec string) (*swarm.ExternalCA, error) {
 			if strings.ToLower(value) == string(swarm.ExternalCAProtocolCFSSL) {
 				externalCA.Protocol = swarm.ExternalCAProtocolCFSSL
 			} else {
-				return nil, fmt.Errorf("unrecognized external CA protocol %s", value)
+				return nil, fmt.Errorf("外部CA %s 协议识别失败", value)
 			}
 		case "url":
 			hasURL = true
@@ -153,20 +153,20 @@ func parseExternalCA(caSpec string) (*swarm.ExternalCA, error) {
 	}
 
 	if !hasProtocol {
-		return nil, errors.New("the external-ca option needs a protocol= parameter")
+		return nil, errors.New("外部CA选项必须拥有一个协议参数 protocol= ")
 	}
 	if !hasURL {
-		return nil, errors.New("the external-ca option needs a url= parameter")
+		return nil, errors.New("外部CA选项必须拥有一个URL参数 url= ")
 	}
 
 	return &externalCA, nil
 }
 
 func addSwarmFlags(flags *pflag.FlagSet, opts *swarmOptions) {
-	flags.Int64Var(&opts.taskHistoryLimit, flagTaskHistoryLimit, 5, "Task history retention limit")
-	flags.DurationVar(&opts.dispatcherHeartbeat, flagDispatcherHeartbeat, time.Duration(5*time.Second), "Dispatcher heartbeat period")
-	flags.DurationVar(&opts.nodeCertExpiry, flagCertExpiry, time.Duration(90*24*time.Hour), "Validity period for node certificates")
-	flags.Var(&opts.externalCA, flagExternalCA, "Specifications of one or more certificate signing endpoints")
+	flags.Int64Var(&opts.taskHistoryLimit, flagTaskHistoryLimit, 5, "任务历史保留数量限制")
+	flags.DurationVar(&opts.dispatcherHeartbeat, flagDispatcherHeartbeat, time.Duration(5*time.Second), "分发器的心跳周期")
+	flags.DurationVar(&opts.nodeCertExpiry, flagCertExpiry, time.Duration(90*24*time.Hour), "节点证书的验证周期")
+	flags.Var(&opts.externalCA, flagExternalCA, "一个或多个认证签名节点的详细说明")
 }
 
 func (opts *swarmOptions) ToSpec() swarm.Spec {

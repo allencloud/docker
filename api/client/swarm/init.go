@@ -36,7 +36,7 @@ func newInitCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "init [OPTIONS]",
-		Short: "Initialize a swarm",
+		Short: "初始化Swarm集群",
 		Args:  cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runInit(dockerCli, cmd.Flags(), opts)
@@ -44,9 +44,9 @@ func newInitCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.Var(&opts.listenAddr, flagListenAddr, "Listen address (format: <ip|interface>[:port])")
-	flags.StringVar(&opts.advertiseAddr, flagAdvertiseAddr, "", "Advertised address (format: <ip|interface>[:port])")
-	flags.BoolVar(&opts.forceNewCluster, "force-new-cluster", false, "Force create a new cluster from current state.")
+	flags.Var(&opts.listenAddr, flagListenAddr, "Swarm监听地址 （格式: <IP地址|网卡>[:端口]）")
+	flags.StringVar(&opts.advertiseAddr, flagAdvertiseAddr, "", "广播地址 （格式: <IP地址|网卡>[:端口]）")
+	flags.BoolVar(&opts.forceNewCluster, "force-new-cluster", false, "从节点当前状态强制创建一个集群。")
 	addSwarmFlags(flags, &opts.swarmOptions)
 	return cmd
 }
@@ -70,12 +70,12 @@ func runInit(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts initOptions
 		return err
 	}
 
-	fmt.Fprintf(dockerCli.Out(), "Swarm initialized: current node (%s) is now a manager.\n\n", nodeID)
+	fmt.Fprintf(dockerCli.Out(), "成功初始化Swarm集群: 当前节点 (%s) 现在已经是管理者角色。\n\n", nodeID)
 
 	if err := printJoinCommand(ctx, dockerCli, nodeID, true, false); err != nil {
 		return err
 	}
 
-	fmt.Fprint(dockerCli.Out(), "To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.\n\n")
+	fmt.Fprint(dockerCli.Out(), "在此Swarm集群中添加一个管理者角色, 运行 'docker swarm join-token manager' 并遵循相应的说明。\n\n")
 	return nil
 }
