@@ -29,7 +29,7 @@ func newPSCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "ps [OPTIONS] STACK",
-		Short: "List the tasks in the stack",
+		Short: "罗列一个stack中的所有运行任务",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.namespace = args[0]
@@ -37,9 +37,9 @@ func newPSCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.all, "all", "a", false, "Display all tasks")
-	flags.BoolVar(&opts.noResolve, "no-resolve", false, "Do not map IDs to Names")
-	flags.VarP(&opts.filter, "filter", "f", "Filter output based on conditions provided")
+	flags.BoolVarP(&opts.all, "all", "a", false, "显示所有任务")
+	flags.BoolVar(&opts.noResolve, "no-resolve", false, "不将ID映射成名称")
+	flags.VarP(&opts.filter, "filter", "f", "基于指定条件过滤命令输出内容")
 
 	return cmd
 }
@@ -62,7 +62,7 @@ func runPS(dockerCli *client.DockerCli, opts psOptions) error {
 	}
 
 	if len(tasks) == 0 {
-		fmt.Fprintf(dockerCli.Out(), "Nothing found in stack: %s\n", namespace)
+		fmt.Fprintf(dockerCli.Out(), "在stack中没有找到任何内容: %s\n", namespace)
 		return nil
 	}
 

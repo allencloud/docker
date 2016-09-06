@@ -14,8 +14,8 @@ import (
 
 var (
 	daemonCli = NewDaemonCli()
-	flHelp    = flag.Bool([]string{"h", "-help"}, false, "Print usage")
-	flVersion = flag.Bool([]string{"v", "-version"}, false, "Print version information and quit")
+	flHelp    = flag.Bool([]string{"h", "-help"}, false, "打印用途")
+	flVersion = flag.Bool([]string{"v", "-version"}, false, "输出版本信息并退出")
 )
 
 func main() {
@@ -31,14 +31,14 @@ func main() {
 	flag.Merge(flag.CommandLine, daemonCli.commonFlags.FlagSet)
 
 	flag.Usage = func() {
-		fmt.Fprint(stdout, "Usage: dockerd [OPTIONS]\n\n")
-		fmt.Fprint(stdout, "A self-sufficient runtime for containers.\n\nOptions:\n")
+		fmt.Fprint(stdout, "用途: dockerd [OPTIONS]\n\n")
+		fmt.Fprint(stdout, "一个为容器而生的运行时管理引擎.\n\n选项:\n")
 
 		flag.CommandLine.SetOutput(stdout)
 		flag.PrintDefaults()
 	}
 	flag.CommandLine.ShortUsage = func() {
-		fmt.Fprint(stderr, "\nUsage:\tdockerd [OPTIONS]\n")
+		fmt.Fprint(stderr, "\n用途:\tdockerd [OPTIONS]\n")
 	}
 
 	if err := flag.CommandLine.ParseFlags(os.Args[1:], false); err != nil {
@@ -75,8 +75,8 @@ func main() {
 
 func showVersion() {
 	if utils.ExperimentalBuild() {
-		fmt.Printf("Docker version %s, build %s, experimental\n", dockerversion.Version, dockerversion.GitCommit)
+		fmt.Printf("Docker引擎版本 %s, 构建 %s, 试验版\n", dockerversion.Version, dockerversion.GitCommit)
 	} else {
-		fmt.Printf("Docker version %s, build %s\n", dockerversion.Version, dockerversion.GitCommit)
+		fmt.Printf("Docker引擎版本 %s, 构建 %s\n", dockerversion.Version, dockerversion.GitCommit)
 	}
 }

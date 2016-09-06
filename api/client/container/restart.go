@@ -24,7 +24,7 @@ func NewRestartCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "restart [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Restart a container",
+		Short: "重启一个或多个容器",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -33,7 +33,7 @@ func NewRestartCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.IntVarP(&opts.nSeconds, "time", "t", 10, "Seconds to wait for stop before killing the container")
+	flags.IntVarP(&opts.nSeconds, "time", "t", 10, "在终止一个容器前，等待容器停止的秒数")
 	return cmd
 }
 

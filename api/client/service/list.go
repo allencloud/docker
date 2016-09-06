@@ -32,7 +32,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
 		Aliases: []string{"list"},
-		Short:   "List services",
+		Short:   "罗列所有服务",
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(dockerCli, opts)
@@ -40,8 +40,8 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display IDs")
-	flags.VarP(&opts.filter, "filter", "f", "Filter output based on conditions provided")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示ID")
+	flags.VarP(&opts.filter, "filter", "f", "根据指定条件过滤命令输出内容")
 
 	return cmd
 }
@@ -98,7 +98,7 @@ func printTable(out io.Writer, services []swarm.Service, running map[string]int)
 	// Ignore flushing errors
 	defer writer.Flush()
 
-	fmt.Fprintf(writer, listItemFmt, "ID", "NAME", "REPLICAS", "IMAGE", "COMMAND")
+	fmt.Fprintf(writer, listItemFmt, "ID", "命令", "副本数", "镜像", "启动命令")
 	for _, service := range services {
 		replicas := ""
 		if service.Spec.Mode.Replicated != nil && service.Spec.Mode.Replicated.Replicas != nil {

@@ -15,7 +15,7 @@ import (
 func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rm PLUGIN",
-		Short:   "Remove a plugin",
+		Short:   "删除指定插件",
 		Aliases: []string{"remove"},
 		Args:    cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -38,7 +38,7 @@ func runRemove(dockerCli *client.DockerCli, names []string) error {
 		}
 		ref, ok := named.(reference.NamedTagged)
 		if !ok {
-			return fmt.Errorf("invalid name: %s", named.String())
+			return fmt.Errorf("无效名称: %s", named.String())
 		}
 		// TODO: pass names to api instead of making multiple api calls
 		if err := dockerCli.Client().PluginRemove(context.Background(), ref.String()); err != nil {

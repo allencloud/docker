@@ -24,7 +24,7 @@ func NewStopCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "stop [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Stop one or more running containers",
+		Short: "停止一个或多个运行容器",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -33,7 +33,7 @@ func NewStopCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.IntVarP(&opts.time, "time", "t", 10, "Seconds to wait for stop before killing it")
+	flags.IntVarP(&opts.time, "time", "t", 10, "终止容器前等待容器停止的秒数")
 	return cmd
 }
 

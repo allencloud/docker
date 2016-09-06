@@ -16,15 +16,15 @@ import (
 // Usage: docker inspect [OPTIONS] CONTAINER|IMAGE|TASK [CONTAINER|IMAGE|TASK...]
 func (cli *DockerCli) CmdInspect(args ...string) error {
 	cmd := Cli.Subcmd("inspect", []string{"[OPTIONS] CONTAINER|IMAGE|TASK [CONTAINER|IMAGE|TASK...]"}, Cli.DockerCommands["inspect"].Description, true)
-	tmplStr := cmd.String([]string{"f", "-format"}, "", "Format the output using the given go template")
-	inspectType := cmd.String([]string{"-type"}, "", "Return JSON for specified type, (e.g image, container or task)")
-	size := cmd.Bool([]string{"s", "-size"}, false, "Display total file sizes if the type is container")
+	tmplStr := cmd.String([]string{"f", "-format"}, "", "基于指定的Go语言模板格式化命令输出内容")
+	inspectType := cmd.String([]string{"-type"}, "", "为指定的类型返回JSON内容")
+	size := cmd.Bool([]string{"s", "-size"}, false, "如果类型为容器，显示所有的文件大小信息")
 	cmd.Require(flag.Min, 1)
 
 	cmd.ParseFlags(args, true)
 
 	if *inspectType != "" && *inspectType != "container" && *inspectType != "image" && *inspectType != "task" {
-		return fmt.Errorf("%q is not a valid value for --type", *inspectType)
+		return fmt.Errorf("对 --type 而言，%q 不是一个有效的值", *inspectType)
 	}
 
 	ctx := context.Background()
@@ -37,7 +37,7 @@ func (cli *DockerCli) CmdInspect(args ...string) error {
 		elementSearcher = cli.inspectImages(ctx, *size)
 	case "task":
 		if *size {
-			fmt.Fprintln(cli.err, "WARNING: --size ignored for tasks")
+			fmt.Fprintln(cli.err, "警告: --size 被任务所忽略")
 		}
 		elementSearcher = cli.inspectTasks(ctx)
 	default:
@@ -77,10 +77,10 @@ func (cli *DockerCli) inspectAll(ctx context.Context, getSize bool) inspect.GetR
 						// Search for task with that id if an image doesn't exists.
 						t, rawTask, err := cli.client.TaskInspectWithRaw(ctx, ref)
 						if err != nil {
-							return nil, nil, fmt.Errorf("Error: No such image, container or task: %s", ref)
+							return nil, nil, fmt.Errorf("错误：没有次容器，镜像，任务: %s", ref)
 						}
 						if getSize {
-							fmt.Fprintln(cli.err, "WARNING: --size ignored for tasks")
+							fmt.Fprintln(cli.err, "警告: --size 被任务所忽略")
 						}
 						return t, rawTask, nil
 					}

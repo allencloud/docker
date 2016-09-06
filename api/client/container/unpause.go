@@ -21,7 +21,7 @@ func NewUnpauseCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "unpause CONTAINER [CONTAINER...]",
-		Short: "Unpause all processes within one or more containers",
+		Short: "恢复一个或多个容器中所有被挂起的进程",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args

@@ -30,7 +30,7 @@ func NewEventsCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "events [OPTIONS]",
-		Short: "Get real time events from the server",
+		Short: "获取Docker引擎的实时事件",
 		Args:  cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runEvents(dockerCli, &opts)
@@ -38,9 +38,9 @@ func NewEventsCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVar(&opts.since, "since", "", "Show all events created since timestamp")
-	flags.StringVar(&opts.until, "until", "", "Stream events until this timestamp")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Filter output based on conditions provided")
+	flags.StringVar(&opts.since, "since", "", "从指定时间戳开始打印所有的事件")
+	flags.StringVar(&opts.until, "until", "", "输出所有的事件直到指定时间戳为止")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "基于指定条件过滤命令输出内容")
 
 	return cmd
 }

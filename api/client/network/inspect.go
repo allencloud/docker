@@ -19,7 +19,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "inspect [OPTIONS] NETWORK [NETWORK...]",
-		Short: "Display detailed information on one or more networks",
+		Short: "显示一个或多个网络的详细信息",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.names = args
@@ -27,7 +27,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.format, "format", "f", "", "Format the output using the given go template")
+	cmd.Flags().StringVarP(&opts.format, "format", "f", "", "根据指定的Go语言模板格式化命令输出内容")
 
 	return cmd
 }

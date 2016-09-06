@@ -27,7 +27,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "inspect [OPTIONS] self|NODE [NODE...]",
-		Short: "Display detailed information on one or more nodes",
+		Short: "显示Swarm集群中一个或多个节点的详细信息",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.nodeIds = args
@@ -36,8 +36,8 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.format, "format", "f", "", "Format the output using the given go template")
-	flags.BoolVar(&opts.pretty, "pretty", false, "Print the information in a human friendly format.")
+	flags.StringVarP(&opts.format, "format", "f", "", "使用指定的Go语言模板格式化命令输出内容。")
+	flags.BoolVar(&opts.pretty, "pretty", false, "通过人工可读的格式输出命令信息。")
 	return cmd
 }
 
@@ -80,40 +80,40 @@ func printHumanFriendly(out io.Writer, refs []string, getRef inspect.GetRefFunc)
 
 // TODO: use a template
 func printNode(out io.Writer, node swarm.Node) {
-	fmt.Fprintf(out, "ID:\t\t\t%s\n", node.ID)
-	ioutils.FprintfIfNotEmpty(out, "Name:\t\t\t%s\n", node.Spec.Name)
+	fmt.Fprintf(out, "节点ID:\t\t\t%s\n", node.ID)
+	ioutils.FprintfIfNotEmpty(out, "名称:\t\t\t%s\n", node.Spec.Name)
 	if node.Spec.Labels != nil {
-		fmt.Fprintln(out, "Labels:")
+		fmt.Fprintln(out, "标签:")
 		for k, v := range node.Spec.Labels {
 			fmt.Fprintf(out, " - %s = %s\n", k, v)
 		}
 	}
 
-	ioutils.FprintfIfNotEmpty(out, "Hostname:\t\t%s\n", node.Description.Hostname)
-	fmt.Fprintf(out, "Joined at:\t\t%s\n", client.PrettyPrint(node.CreatedAt))
-	fmt.Fprintln(out, "Status:")
-	fmt.Fprintf(out, " State:\t\t\t%s\n", client.PrettyPrint(node.Status.State))
-	ioutils.FprintfIfNotEmpty(out, " Message:\t\t%s\n", client.PrettyPrint(node.Status.Message))
-	fmt.Fprintf(out, " Availability:\t\t%s\n", client.PrettyPrint(node.Spec.Availability))
+	ioutils.FprintfIfNotEmpty(out, "主机名:\t\t%s\n", node.Description.Hostname)
+	fmt.Fprintf(out, "加入集群时间:\t\t%s\n", client.PrettyPrint(node.CreatedAt))
+	fmt.Fprintln(out, "状态:")
+	fmt.Fprintf(out, " 状态:\t\t\t%s\n", client.PrettyPrint(node.Status.State))
+	ioutils.FprintfIfNotEmpty(out, " 状态消息:\t\t%s\n", client.PrettyPrint(node.Status.Message))
+	fmt.Fprintf(out, " 可达状态:\t\t%s\n", client.PrettyPrint(node.Spec.Availability))
 
 	if node.ManagerStatus != nil {
-		fmt.Fprintln(out, "Manager Status:")
-		fmt.Fprintf(out, " Address:\t\t%s\n", node.ManagerStatus.Addr)
-		fmt.Fprintf(out, " Raft Status:\t\t%s\n", client.PrettyPrint(node.ManagerStatus.Reachability))
+		fmt.Fprintln(out, "管理角色状态:")
+		fmt.Fprintf(out, " 监听地址:\t\t%s\n", node.ManagerStatus.Addr)
+		fmt.Fprintf(out, " Raft一致性状态:\t\t%s\n", client.PrettyPrint(node.ManagerStatus.Reachability))
 		leader := "No"
 		if node.ManagerStatus.Leader {
 			leader = "Yes"
 		}
-		fmt.Fprintf(out, " Leader:\t\t%s\n", leader)
+		fmt.Fprintf(out, " 领导者:\t\t%s\n", leader)
 	}
 
-	fmt.Fprintln(out, "Platform:")
-	fmt.Fprintf(out, " Operating System:\t%s\n", node.Description.Platform.OS)
-	fmt.Fprintf(out, " Architecture:\t\t%s\n", node.Description.Platform.Architecture)
+	fmt.Fprintln(out, "平台信息:")
+	fmt.Fprintf(out, " 操作系统:\t%s\n", node.Description.Platform.OS)
+	fmt.Fprintf(out, " 机器架构:\t\t%s\n", node.Description.Platform.Architecture)
 
-	fmt.Fprintln(out, "Resources:")
-	fmt.Fprintf(out, " CPUs:\t\t\t%d\n", node.Description.Resources.NanoCPUs/1e9)
-	fmt.Fprintf(out, " Memory:\t\t%s\n", units.BytesSize(float64(node.Description.Resources.MemoryBytes)))
+	fmt.Fprintln(out, "机器资源:")
+	fmt.Fprintf(out, " CPU总数量:\t\t\t%d\n", node.Description.Resources.NanoCPUs/1e9)
+	fmt.Fprintf(out, " 总内存:\t\t%s\n", units.BytesSize(float64(node.Description.Resources.MemoryBytes)))
 
 	var pluginTypes []string
 	pluginNamesByType := map[string][]string{}
@@ -126,16 +126,16 @@ func printNode(out io.Writer, node swarm.Node) {
 	}
 
 	if len(pluginTypes) > 0 {
-		fmt.Fprintln(out, "Plugins:")
+		fmt.Fprintln(out, "插件:")
 		sort.Strings(pluginTypes) // ensure stable output
 		for _, pluginType := range pluginTypes {
 			fmt.Fprintf(out, "  %s:\t\t%s\n", pluginType, strings.Join(pluginNamesByType[pluginType], ", "))
 		}
 	}
-	fmt.Fprintf(out, "Engine Version:\t\t%s\n", node.Description.Engine.EngineVersion)
+	fmt.Fprintf(out, "Docker引擎版本:\t\t%s\n", node.Description.Engine.EngineVersion)
 
 	if len(node.Description.Engine.Labels) != 0 {
-		fmt.Fprintln(out, "Engine Labels:")
+		fmt.Fprintln(out, "Docker引擎标签:")
 		for k, v := range node.Description.Engine.Labels {
 			fmt.Fprintf(out, " - %s = %s\n", k, v)
 		}

@@ -18,22 +18,22 @@ import (
 // Usage: docker update [OPTIONS] CONTAINER [CONTAINER...]
 func (cli *DockerCli) CmdUpdate(args ...string) error {
 	cmd := Cli.Subcmd("update", []string{"CONTAINER [CONTAINER...]"}, Cli.DockerCommands["update"].Description, true)
-	flBlkioWeight := cmd.Uint16([]string{"-blkio-weight"}, 0, "Block IO (relative weight), between 10 and 1000")
-	flCPUPeriod := cmd.Int64([]string{"-cpu-period"}, 0, "Limit CPU CFS (Completely Fair Scheduler) period")
-	flCPUQuota := cmd.Int64([]string{"-cpu-quota"}, 0, "Limit CPU CFS (Completely Fair Scheduler) quota")
-	flCpusetCpus := cmd.String([]string{"-cpuset-cpus"}, "", "CPUs in which to allow execution (0-3, 0,1)")
-	flCpusetMems := cmd.String([]string{"-cpuset-mems"}, "", "MEMs in which to allow execution (0-3, 0,1)")
-	flCPUShares := cmd.Int64([]string{"c", "-cpu-shares"}, 0, "CPU shares (relative weight)")
-	flMemoryString := cmd.String([]string{"m", "-memory"}, "", "Memory limit")
-	flMemoryReservation := cmd.String([]string{"-memory-reservation"}, "", "Memory soft limit")
-	flMemorySwap := cmd.String([]string{"-memory-swap"}, "", "Swap limit equal to memory plus swap: '-1' to enable unlimited swap")
-	flKernelMemory := cmd.String([]string{"-kernel-memory"}, "", "Kernel memory limit")
-	flRestartPolicy := cmd.String([]string{"-restart"}, "", "Restart policy to apply when a container exits")
+	flBlkioWeight := cmd.Uint16([]string{"-blkio-weight"}, 0, "磁盘IO设置(相对值),从10到1000")
+	flCPUPeriod := cmd.Int64([]string{"-cpu-period"}, 0, "限制CPU绝对公平调度算法（CFS）的时间周期")
+	flCPUQuota := cmd.Int64([]string{"-cpu-quota"}, 0, "限制CPU绝对公平调度算法（CFS）的时间限额")
+	flCpusetCpus := cmd.String([]string{"-cpuset-cpus"}, "", "允许容器执行的CPU核指定(0-3,0,1): 0-3代表运行运行在0,1,2,3这4个核上")
+	flCpusetMems := cmd.String([]string{"-cpuset-mems"}, "", "允许容器执行的CPU内存所在核指定(0-3,0,1): 0-3代表运行运行在0,1,2,3这4个核上")
+	flCPUShares := cmd.Int64([]string{"c", "-cpu-shares"}, 0, "CPU计算资源的值(相对值)")
+	flMemoryString := cmd.String([]string{"m", "-memory"}, "", "内存限制")
+	flMemoryReservation := cmd.String([]string{"-memory-reservation"}, "", "内存软限制")
+	flMemorySwap := cmd.String([]string{"-memory-swap"}, "", "交换内存限制 等于 实际内存 ＋ 交换区内存: '-1' 代表启用不受限的交换区内存")
+	flKernelMemory := cmd.String([]string{"-kernel-memory"}, "", "内核内存限制")
+	flRestartPolicy := cmd.String([]string{"-restart"}, "", "当容器退出时应用在容器上的重启策略")
 
 	cmd.Require(flag.Min, 1)
 	cmd.ParseFlags(args, true)
 	if cmd.NFlag() == 0 {
-		return fmt.Errorf("You must provide one or more flags when using this command.")
+		return fmt.Errorf("当使用此命令时，您必须提供一个或多个命令参数。")
 	}
 
 	var err error

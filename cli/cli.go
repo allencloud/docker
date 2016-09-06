@@ -39,7 +39,7 @@ func New(handlers ...Handler) *Cli {
 	return cli
 }
 
-var errCommandNotFound = errors.New("command not found")
+var errCommandNotFound = errors.New("命令没有找到")
 
 func (cli *Cli) command(args ...string) (func(...string) error, error) {
 	for _, c := range cli.handlers {
@@ -87,7 +87,7 @@ func (cli *Cli) noSuchCommand(command string) {
 	if cli.Stderr == nil {
 		cli.Stderr = os.Stderr
 	}
-	fmt.Fprintf(cli.Stderr, "docker: '%s' is not a docker command.\nSee 'docker --help'.\n", command)
+	fmt.Fprintf(cli.Stderr, "docker: '%s' 不是一个 docker 命令.\n查看 'docker --help'.\n", command)
 	os.Exit(1)
 }
 

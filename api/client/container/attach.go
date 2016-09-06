@@ -29,7 +29,7 @@ func NewAttachCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "attach [OPTIONS] CONTAINER",
-		Short: "Attach to a running container",
+		Short: "附加到一个运行的容器，包含标准输入，标准输出，标准错误",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.container = args[0]
@@ -38,9 +38,9 @@ func NewAttachCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVar(&opts.noStdin, "no-stdin", false, "Do not attach STDIN")
-	flags.BoolVar(&opts.proxy, "sig-proxy", true, "Proxy all received signals to the process")
-	flags.StringVar(&opts.detachKeys, "detach-keys", "", "Override the key sequence for detaching a container")
+	flags.BoolVar(&opts.noStdin, "no-stdin", false, "不附加标准输入")
+	flags.BoolVar(&opts.proxy, "sig-proxy", true, "代理所有接收到的信号至进程")
+	flags.StringVar(&opts.detachKeys, "detach-keys", "", "覆盖从一个容器停止附加的输入键顺序")
 	return cmd
 }
 
@@ -53,11 +53,11 @@ func runAttach(dockerCli *client.DockerCli, opts *attachOptions) error {
 	}
 
 	if !c.State.Running {
-		return fmt.Errorf("You cannot attach to a stopped container, start it first")
+		return fmt.Errorf("您不能附加到一个停止的容器中，请先启动此容器。")
 	}
 
 	if c.State.Paused {
-		return fmt.Errorf("You cannot attach to a paused container, unpause it first")
+		return fmt.Errorf("您不能附加到一个暂停的容器中，请先启动此容器。")
 	}
 
 	if err := dockerCli.CheckTtyInput(!opts.noStdin, c.Config.Tty); err != nil {

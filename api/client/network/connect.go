@@ -28,7 +28,7 @@ func newConnectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "connect [OPTIONS] NETWORK CONTAINER",
-		Short: "Connect a container to a network",
+		Short: "连接一个容器到一个网络",
 		Args:  cli.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.network = args[0]
@@ -38,11 +38,11 @@ func newConnectCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVar(&opts.ipaddress, "ip", "", "IP Address")
-	flags.StringVar(&opts.ipv6address, "ip6", "", "IPv6 Address")
-	flags.Var(&opts.links, "link", "Add link to another container")
-	flags.StringSliceVar(&opts.aliases, "alias", []string{}, "Add network-scoped alias for the container")
-	flags.StringSliceVar(&opts.linklocalips, "link-local-ip", []string{}, "Add a link-local address for the container")
+	flags.StringVar(&opts.ipaddress, "ip", "", "IP 地址")
+	flags.StringVar(&opts.ipv6address, "ip6", "", "IPv6 地址")
+	flags.Var(&opts.links, "link", "为另一个容器添加链接")
+	flags.StringSliceVar(&opts.aliases, "alias", []string{}, "为容器添加网络范围的别名")
+	flags.StringSliceVar(&opts.linklocalips, "link-local-ip", []string{}, "为容器添加一个当地链接的地址")
 
 	return cmd
 }

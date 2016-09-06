@@ -21,14 +21,14 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rm [OPTIONS] NODE [NODE...]",
 		Aliases: []string{"remove"},
-		Short:   "Remove one or more nodes from the swarm",
+		Short:   "从Swarm集群中删除一个或多个节点",
 		Args:    cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runRemove(dockerCli, args, opts)
 		},
 	}
 	flags := cmd.Flags()
-	flags.BoolVar(&opts.force, "force", false, "Force remove an active node")
+	flags.BoolVar(&opts.force, "force", false, "强制删除一个活跃节点")
 	return cmd
 }
 

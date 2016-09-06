@@ -18,7 +18,7 @@ func newUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update [OPTIONS] NODE",
-		Short: "Update a node",
+		Short: "更新Swarm集群中的单个节点",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runUpdate(dockerCli, cmd.Flags(), args[0])
@@ -26,11 +26,11 @@ func newUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVar(&nodeOpts.role, flagRole, "", "Role of the node (worker/manager)")
-	flags.StringVar(&nodeOpts.availability, flagAvailability, "", "Availability of the node (active/pause/drain)")
-	flags.Var(&nodeOpts.annotations.labels, flagLabelAdd, "Add or update a node label (key=value)")
+	flags.StringVar(&nodeOpts.role, flagRole, "", "节点角色工作者或管理者(worker/manager)")
+	flags.StringVar(&nodeOpts.availability, flagAvailability, "", "节点的可达状态（活跃/暂停/维护）(active/pause/drain)")
+	flags.Var(&nodeOpts.annotations.labels, flagLabelAdd, "添加或更新一个标签信息（键＝值）(key=value)")
 	labelKeys := opts.NewListOpts(nil)
-	flags.Var(&labelKeys, flagLabelRemove, "Remove a node label if exists")
+	flags.Var(&labelKeys, flagLabelRemove, "删除一个节点标签，如果存在的话")
 	return cmd
 }
 

@@ -18,7 +18,7 @@ func NoArgs(cmd *cobra.Command, args []string) error {
 	}
 
 	return fmt.Errorf(
-		"\"%s\" accepts no argument(s).\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
+		"\"%s\" 不接受任何参数.\n查看 '%s --help'.\n\n用途:  %s\n\n%s",
 		cmd.CommandPath(),
 		cmd.CommandPath(),
 		cmd.UseLine(),
@@ -33,7 +33,7 @@ func RequiresMinArgs(min int) cobra.PositionalArgs {
 			return nil
 		}
 		return fmt.Errorf(
-			"\"%s\" requires at least %d argument(s).\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
+			"\"%s\" 需要至少 %d 个参数.\n查看 '%s --help'.\n\n用途:  %s\n\n%s",
 			cmd.CommandPath(),
 			min,
 			cmd.CommandPath(),
@@ -50,7 +50,7 @@ func RequiresMaxArgs(max int) cobra.PositionalArgs {
 			return nil
 		}
 		return fmt.Errorf(
-			"\"%s\" requires at most %d argument(s).\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
+			"\"%s\" 需要至多 %d 个参数.\n查看 '%s --help'.\n\n用途:  %s\n\n%s",
 			cmd.CommandPath(),
 			max,
 			cmd.CommandPath(),
@@ -67,7 +67,7 @@ func RequiresRangeArgs(min int, max int) cobra.PositionalArgs {
 			return nil
 		}
 		return fmt.Errorf(
-			"\"%s\" requires at least %d and at most %d argument(s).\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
+			"\"%s\" 需要至少 %d 个， 至多 %d 个参数.\n查看 '%s --help'.\n\n用途:  %s\n\n%s",
 			cmd.CommandPath(),
 			min,
 			max,
@@ -85,7 +85,7 @@ func ExactArgs(number int) cobra.PositionalArgs {
 			return nil
 		}
 		return fmt.Errorf(
-			"\"%s\" requires exactly %d argument(s).\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
+			"\"%s\" 需要正好 %d 个参数.\n查看 '%s --help'.\n\n用途:  %s\n\n%s",
 			cmd.CommandPath(),
 			number,
 			cmd.CommandPath(),

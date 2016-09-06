@@ -16,7 +16,7 @@ import (
 func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "inspect PLUGIN",
-		Short: "Inspect a plugin",
+		Short: "查看指定插件的详细信息",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runInspect(dockerCli, args[0])
@@ -36,7 +36,7 @@ func runInspect(dockerCli *client.DockerCli, name string) error {
 	}
 	ref, ok := named.(reference.NamedTagged)
 	if !ok {
-		return fmt.Errorf("invalid name: %s", named.String())
+		return fmt.Errorf("无效名称: %s", named.String())
 	}
 	p, err := dockerCli.Client().PluginInspect(context.Background(), ref.String())
 	if err != nil {

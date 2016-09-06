@@ -30,7 +30,7 @@ func NewStartCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "start [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Start one or more stopped containers",
+		Short: "启动一个或多个停止的容器",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -39,9 +39,9 @@ func NewStartCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.attach, "attach", "a", false, "Attach STDOUT/STDERR and forward signals")
-	flags.BoolVarP(&opts.openStdin, "interactive", "i", false, "Attach container's STDIN")
-	flags.StringVar(&opts.detachKeys, "detach-keys", "", "Override the key sequence for detaching a container")
+	flags.BoolVarP(&opts.attach, "attach", "a", false, "附件标准输出/标准错误，同时转发信号")
+	flags.BoolVarP(&opts.openStdin, "interactive", "i", false, "附加容器的标准输入")
+	flags.StringVar(&opts.detachKeys, "detach-keys", "", "覆盖从一个容器退出附加操作时的按键顺序")
 	return cmd
 }
 
@@ -52,7 +52,7 @@ func runStart(dockerCli *client.DockerCli, opts *startOptions) error {
 		// We're going to attach to a container.
 		// 1. Ensure we only have one container.
 		if len(opts.containers) > 1 {
-			return fmt.Errorf("You cannot start and attach multiple containers at once.")
+			return fmt.Errorf("您不能一次性启动和附加到多个容器。")
 		}
 
 		// 2. Attach to the container.
@@ -112,7 +112,7 @@ func runStart(dockerCli *client.DockerCli, opts *startOptions) error {
 		// 4. Wait for attachment to break.
 		if c.Config.Tty && dockerCli.IsTerminalOut() {
 			if err := dockerCli.MonitorTtySize(ctx, c.ID, false); err != nil {
-				fmt.Fprintf(dockerCli.Err(), "Error monitoring TTY size: %s\n", err)
+				fmt.Fprintf(dockerCli.Err(), "监视终端大小出错: %s\n", err)
 			}
 		}
 		if attchErr := <-cErr; attchErr != nil {
@@ -146,7 +146,7 @@ func startContainersWithoutAttachments(dockerCli *client.DockerCli, ctx context.
 	}
 
 	if len(failedContainers) > 0 {
-		return fmt.Errorf("Error: failed to start containers: %v", strings.Join(failedContainers, ", "))
+		return fmt.Errorf("错误: 启动容器失败:  %v", strings.Join(failedContainers, ", "))
 	}
 	return nil
 }

@@ -27,7 +27,7 @@ func NewImportCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "import [OPTIONS] file|URL|- [REPOSITORY[:TAG]]",
-		Short: "Import the contents from a tarball to create a filesystem image",
+		Short: "从一个压缩包中导入内容，从而创建一个文件系统镜像",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.source = args[0]
@@ -40,8 +40,8 @@ func NewImportCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.StringSliceVarP(&opts.changes, "change", "c", []string{}, "Apply Dockerfile instruction to the created image")
-	flags.StringVarP(&opts.message, "message", "m", "", "Set commit message for imported image")
+	flags.StringSliceVarP(&opts.changes, "change", "c", []string{}, "应用Dockerfile中的指令到新创建出的镜像")
+	flags.StringVarP(&opts.message, "message", "m", "", "为导入的镜像设置提交信息")
 
 	return cmd
 }

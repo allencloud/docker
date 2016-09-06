@@ -13,7 +13,7 @@ import (
 func NewNetworkCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "network",
-		Short: "Manage Docker networks",
+		Short: "管理Docker网络",
 		Args:  cli.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Fprintf(dockerCli.Err(), "\n"+cmd.UsageString())

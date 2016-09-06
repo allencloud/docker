@@ -42,7 +42,7 @@ func NewCopyCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: `cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
 	docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH`,
-		Short: "Copy files/folders between a container and the local filesystem",
+		Short: "在容器和宿主机本地文件系统之间拷贝文件",
 		Long: strings.Join([]string{
 			"Copy files/folders between a container and the local filesystem\n",
 			"\nUse '-' as the source to read a tar archive from stdin\n",
@@ -53,10 +53,10 @@ func NewCopyCommand(dockerCli *client.DockerCli) *cobra.Command {
 		Args: cli.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if args[0] == "" {
-				return fmt.Errorf("source can not be empty")
+				return fmt.Errorf("拷贝的源地址不能为空")
 			}
 			if args[1] == "" {
-				return fmt.Errorf("destination can not be empty")
+				return fmt.Errorf("拷贝的目的地址不能为空")
 			}
 			opts.source = args[0]
 			opts.destination = args[1]
@@ -66,7 +66,7 @@ func NewCopyCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.BoolVarP(&opts.followLink, "follow-link", "L", false, "Always follow symbol link in SRC_PATH")
+	flags.BoolVarP(&opts.followLink, "follow-link", "L", false, "允许在源地址(SRC_PATH)中遵循符号链接的规则")
 
 	return cmd
 }
@@ -96,10 +96,10 @@ func runCopy(dockerCli *client.DockerCli, opts copyOptions) error {
 		return copyToContainer(ctx, dockerCli, srcPath, dstContainer, dstPath, cpParam)
 	case acrossContainers:
 		// Copying between containers isn't supported.
-		return fmt.Errorf("copying between containers is not supported")
+		return fmt.Errorf("在容器间拷贝内容目前还不支持")
 	default:
 		// User didn't specify any container.
-		return fmt.Errorf("must specify at least one container source")
+		return fmt.Errorf("必须指定至少一个容器地址")
 	}
 }
 
@@ -227,7 +227,7 @@ func copyToContainer(ctx context.Context, dockerCli *client.DockerCli, srcPath, 
 		content = os.Stdin
 		resolvedDstPath = dstInfo.Path
 		if !dstInfo.IsDir {
-			return fmt.Errorf("destination %q must be a directory", fmt.Sprintf("%s:%s", dstContainer, dstPath))
+			return fmt.Errorf("目标地址 %q 必须是一个目录地址", fmt.Sprintf("%s:%s", dstContainer, dstPath))
 		}
 	} else {
 		// Prepare source copy info.

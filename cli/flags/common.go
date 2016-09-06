@@ -56,20 +56,20 @@ func InitCommonFlags() *CommonFlags {
 
 	cmd := commonFlags.FlagSet
 
-	cmd.BoolVar(&commonFlags.Debug, []string{"D", "-debug"}, false, "Enable debug mode")
-	cmd.StringVar(&commonFlags.LogLevel, []string{"l", "-log-level"}, "info", "Set the logging level")
-	cmd.BoolVar(&commonFlags.TLS, []string{"-tls"}, false, "Use TLS; implied by --tlsverify")
-	cmd.BoolVar(&commonFlags.TLSVerify, []string{"-tlsverify"}, dockerTLSVerify, "Use TLS and verify the remote")
+	cmd.BoolVar(&commonFlags.Debug, []string{"D", "-debug"}, false, "开启调试模式")
+	cmd.StringVar(&commonFlags.LogLevel, []string{"l", "-log-level"}, "info", "设置日志级别")
+	cmd.BoolVar(&commonFlags.TLS, []string{"-tls"}, false, "使用TLS通过参数--tlsverify")
+	cmd.BoolVar(&commonFlags.TLSVerify, []string{"-tlsverify"}, dockerTLSVerify, "使用TLS来验证远程连接")
 
 	// TODO use flag flag.String([]string{"i", "-identity"}, "", "Path to libtrust key file")
 
 	var tlsOptions tlsconfig.Options
 	commonFlags.TLSOptions = &tlsOptions
-	cmd.StringVar(&tlsOptions.CAFile, []string{"-tlscacert"}, filepath.Join(dockerCertPath, DefaultCaFile), "Trust certs signed only by this CA")
-	cmd.StringVar(&tlsOptions.CertFile, []string{"-tlscert"}, filepath.Join(dockerCertPath, DefaultCertFile), "Path to TLS certificate file")
-	cmd.StringVar(&tlsOptions.KeyFile, []string{"-tlskey"}, filepath.Join(dockerCertPath, DefaultKeyFile), "Path to TLS key file")
+	cmd.StringVar(&tlsOptions.CAFile, []string{"-tlscacert"}, filepath.Join(dockerCertPath, DefaultCaFile), "仅被CA签名的受信certs路径信息")
+	cmd.StringVar(&tlsOptions.CertFile, []string{"-tlscert"}, filepath.Join(dockerCertPath, DefaultCertFile), "TLS 证书文件的路径信息")
+	cmd.StringVar(&tlsOptions.KeyFile, []string{"-tlskey"}, filepath.Join(dockerCertPath, DefaultKeyFile), "TLS 密钥文件路径信息")
 
-	cmd.Var(opts.NewNamedListOptsRef("hosts", &commonFlags.Hosts, opts.ValidateHost), []string{"H", "-host"}, "Daemon socket(s) to connect to")
+	cmd.Var(opts.NewNamedListOptsRef("hosts", &commonFlags.Hosts, opts.ValidateHost), []string{"H", "-host"}, "Docker引擎监听的套接字")
 	return commonFlags
 }
 
@@ -113,7 +113,7 @@ func SetDaemonLogLevel(logLevel string) {
 	if logLevel != "" {
 		lvl, err := logrus.ParseLevel(logLevel)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to parse logging level: %s\n", logLevel)
+			fmt.Fprintf(os.Stderr, "无法解析日志级别: %s\n", logLevel)
 			os.Exit(1)
 		}
 		logrus.SetLevel(lvl)

@@ -27,7 +27,7 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create [OPTIONS]",
-		Short: "Create a volume",
+		Short: "创建一个数据存储卷",
 		Long:  createDescription,
 		Args:  cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -35,10 +35,10 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.driver, "driver", "d", "local", "Specify volume driver name")
-	flags.StringVar(&opts.name, "name", "", "Specify volume name")
-	flags.VarP(&opts.driverOpts, "opt", "o", "Set driver specific options")
-	flags.StringSliceVar(&opts.labels, "label", []string{}, "Set metadata for a volume")
+	flags.StringVarP(&opts.driver, "driver", "d", "local", "指定存储驱动的名称")
+	flags.StringVar(&opts.name, "name", "", "指定存储卷的名称")
+	flags.VarP(&opts.driverOpts, "opt", "o", "设置驱动的指定参数")
+	flags.StringSliceVar(&opts.labels, "label", []string{}, "为一个存储卷设置元数据")
 
 	return cmd
 }

@@ -14,7 +14,7 @@ import (
 func NewStackCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "stack",
-		Short: "Manage Docker stacks",
+		Short: "管理Docker stack",
 		Args:  cli.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Fprintf(dockerCli.Err(), "\n"+cmd.UsageString())

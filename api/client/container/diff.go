@@ -21,7 +21,7 @@ func NewDiffCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "diff CONTAINER",
-		Short: "Inspect changes on a container's filesystem",
+		Short: "查看容器文件系统的变化差异",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.container = args[0]
@@ -34,7 +34,7 @@ func NewDiffCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 func runDiff(dockerCli *client.DockerCli, opts *diffOptions) error {
 	if opts.container == "" {
-		return fmt.Errorf("Container name cannot be empty")
+		return fmt.Errorf("容器名称不能为空")
 	}
 	ctx := context.Background()
 

@@ -33,7 +33,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
 		Aliases: []string{"list"},
-		Short:   "List networks",
+		Short:   "罗列所有网络",
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(dockerCli, opts)
@@ -41,9 +41,10 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display network IDs")
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Do not truncate the output")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Provide filter values (i.e. 'dangling=true')")
+
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示网络ID")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断命令输出内容")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "提供一些过滤值(比如 'dangling=true')")
 
 	return cmd
 }
@@ -71,7 +72,7 @@ func runList(dockerCli *client.DockerCli, opts listOptions) error {
 
 	w := tabwriter.NewWriter(dockerCli.Out(), 20, 1, 3, ' ', 0)
 	if !opts.quiet {
-		fmt.Fprintf(w, "NETWORK ID\tNAME\tDRIVER\tSCOPE")
+		fmt.Fprintf(w, "网络ID\t名称\t驱动\t范围")
 		fmt.Fprintf(w, "\n")
 	}
 

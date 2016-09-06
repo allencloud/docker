@@ -31,7 +31,7 @@ func NewHistoryCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "history [OPTIONS] IMAGE",
-		Short: "Show the history of an image",
+		Short: "显示一个镜像的历史信息",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.image = args[0]
@@ -41,9 +41,9 @@ func NewHistoryCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.BoolVarP(&opts.human, "human", "H", true, "Print sizes and dates in human readable format")
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only show numeric IDs")
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Don't truncate output")
+	flags.BoolVarP(&opts.human, "human", "H", true, "在人工可读的格式下打印镜像的大小和日期")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示数字ID")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断命令输出内容")
 
 	return cmd
 }
@@ -75,7 +75,7 @@ func runHistory(dockerCli *client.DockerCli, opts historyOptions) error {
 	var created string
 	var size string
 
-	fmt.Fprintln(w, "IMAGE\tCREATED\tCREATED BY\tSIZE\tCOMMENT")
+	fmt.Fprintln(w, "镜像\t创建时间\t创建者\t大小\t备注")
 	for _, entry := range history {
 		imageID = entry.ID
 		createdBy = strings.Replace(entry.CreatedBy, "\t", " ", -1)

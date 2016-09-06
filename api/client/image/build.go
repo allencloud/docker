@@ -69,7 +69,7 @@ func NewBuildCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "build [OPTIONS] PATH | URL | -",
-		Short: "Build an image from a Dockerfile",
+		Short: "从一个Dockerfile构建新的镜像",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			options.context = args[0]
@@ -79,26 +79,26 @@ func NewBuildCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.VarP(&options.tags, "tag", "t", "Name and optionally a tag in the 'name:tag' format")
-	flags.Var(&options.buildArgs, "build-arg", "Set build-time variables")
-	flags.Var(options.ulimits, "ulimit", "Ulimit options")
-	flags.StringVarP(&options.dockerfileName, "file", "f", "", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
-	flags.StringVarP(&options.memory, "memory", "m", "", "Memory limit")
-	flags.StringVar(&options.memorySwap, "memory-swap", "", "Swap limit equal to memory plus swap: '-1' to enable unlimited swap")
-	flags.StringVar(&options.shmSize, "shm-size", "", "Size of /dev/shm, default value is 64MB")
-	flags.Int64VarP(&options.cpuShares, "cpu-shares", "c", 0, "CPU shares (relative weight)")
-	flags.Int64Var(&options.cpuPeriod, "cpu-period", 0, "Limit the CPU CFS (Completely Fair Scheduler) period")
-	flags.Int64Var(&options.cpuQuota, "cpu-quota", 0, "Limit the CPU CFS (Completely Fair Scheduler) quota")
-	flags.StringVar(&options.cpuSetCpus, "cpuset-cpus", "", "CPUs in which to allow execution (0-3, 0,1)")
-	flags.StringVar(&options.cpuSetMems, "cpuset-mems", "", "MEMs in which to allow execution (0-3, 0,1)")
-	flags.StringVar(&options.cgroupParent, "cgroup-parent", "", "Optional parent cgroup for the container")
-	flags.StringVar(&options.isolation, "isolation", "", "Container isolation technology")
-	flags.Var(&options.labels, "label", "Set metadata for an image")
-	flags.BoolVar(&options.noCache, "no-cache", false, "Do not use cache when building the image")
-	flags.BoolVar(&options.rm, "rm", true, "Remove intermediate containers after a successful build")
-	flags.BoolVar(&options.forceRm, "force-rm", false, "Always remove intermediate containers")
-	flags.BoolVarP(&options.quiet, "quiet", "q", false, "Suppress the build output and print image ID on success")
-	flags.BoolVar(&options.pull, "pull", false, "Always attempt to pull a newer version of the image")
+	flags.VarP(&options.tags, "tag", "t", "镜像名称以及可选的标签，若指定标签，格式为：'名称:标签' ")
+	flags.Var(&options.buildArgs, "build-arg", "设置构建时的环境变量")
+	flags.Var(options.ulimits, "ulimit", "设置Ulimit参数")
+	flags.StringVarP(&options.dockerfileName, "file", "f", "", "Dockerfile的名称(默认为当前目录下的Dockerfile文件路径)")
+	flags.StringVarP(&options.memory, "memory", "m", "", "内存限制")
+	flags.StringVar(&options.memorySwap, "memory-swap", "", "交换内存限制 等于 实际内存 ＋ 交换区内存: '-1' 代表启用不受限的交换区内存")
+	flags.StringVar(&options.shmSize, "shm-size", "", "共享内存/dev/shm 的大小, 默认值是64MB")
+	flags.Int64VarP(&options.cpuShares, "cpu-shares", "c", 0, "CPU计算资源的值(相对值)")
+	flags.Int64Var(&options.cpuPeriod, "cpu-period", 0, "限制CPU绝对公平调度算法(CFS)的时间周期")
+	flags.Int64Var(&options.cpuQuota, "cpu-quota", 0, "限制CPU绝对公平调度算法(CFS)的时间限额")
+	flags.StringVar(&options.cpuSetCpus, "cpuset-cpus", "", "允许容器执行的CPU核指定(0-3,0,1): 0-3代表运行运行在0,1,2,3这4个核上")
+	flags.StringVar(&options.cpuSetMems, "cpuset-mems", "", "允许容器执行的CPU内存所在核指定(0-3,0,1): 0-3代表运行运行在0,1,2,3这4个核上")
+	flags.StringVar(&options.cgroupParent, "cgroup-parent", "", "容器的可选cgroup父路径")
+	flags.StringVar(&options.isolation, "isolation", "", "设置容器的隔离策略")
+	flags.Var(&options.labels, "label", "为一个镜像设置元数据")
+	flags.BoolVar(&options.noCache, "no-cache", false, "构建镜像时不使用镜像缓存")
+	flags.BoolVar(&options.rm, "rm", true, "成狗构建后删除中间容器")
+	flags.BoolVar(&options.forceRm, "force-rm", false, "总是产出中间结果的容器")
+	flags.BoolVarP(&options.quiet, "quiet", "q", false, "压缩构建输出，并在构建成功时打印镜像ID")
+	flags.BoolVar(&options.pull, "pull", false, "总是尝试下拉最新版本的镜像")
 
 	client.AddTrustedFlags(flags, true)
 
@@ -144,7 +144,7 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 		if options.quiet && urlutil.IsURL(specifiedContext) {
 			fmt.Fprintln(dockerCli.Err(), progBuff)
 		}
-		return fmt.Errorf("unable to prepare context: %s", err)
+		return fmt.Errorf("准备构建上下文失败: %s", err)
 	}
 
 	if tempDir != "" {
@@ -156,7 +156,7 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 		// And canonicalize dockerfile name to a platform-independent one
 		relDockerfile, err = archive.CanonicalTarNameForPath(relDockerfile)
 		if err != nil {
-			return fmt.Errorf("cannot canonicalize dockerfile path %s: %v", relDockerfile, err)
+			return fmt.Errorf("不能规范Dockerfile路径 %s: %v", relDockerfile, err)
 		}
 
 		f, err := os.Open(filepath.Join(contextDir, ".dockerignore"))
@@ -173,7 +173,7 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 		}
 
 		if err := builder.ValidateContextDirectory(contextDir, excludes); err != nil {
-			return fmt.Errorf("Error checking context: '%s'.", err)
+			return fmt.Errorf("检验构建上下文出错: '%s'.", err)
 		}
 
 		// If .dockerignore mentions .dockerignore or the Dockerfile
@@ -291,7 +291,7 @@ func runBuild(dockerCli *client.DockerCli, options buildOptions) error {
 	// Windows: show error message about modified file permissions if the
 	// daemon isn't running Windows.
 	if response.OSType != "windows" && runtime.GOOS == "windows" {
-		fmt.Fprintln(dockerCli.Err(), `SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.`)
+		fmt.Fprintln(dockerCli.Err(), `安全警告: 您在一个非Windows的Docker引擎上构建Windows机器的Docker的镜像。所有添加到构建上下文的文件和目录将添加'-rwxr-xr-x'权限。推荐您为敏感的文件和目录进行权限的重复查验。`)
 	}
 
 	// Everything worked so if -q was provided the output from the daemon

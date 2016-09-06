@@ -44,7 +44,7 @@ func NewRunCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "run [OPTIONS] IMAGE [COMMAND] [ARG...]",
-		Short: "Run a command in a new container",
+		Short: "在一个新的容器运行一条命令",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			copts.Image = args[0]
@@ -59,15 +59,15 @@ func NewRunCommand(dockerCli *client.DockerCli) *cobra.Command {
 	flags.SetInterspersed(false)
 
 	// These are flags not stored in Config/HostConfig
-	flags.BoolVar(&opts.autoRemove, "rm", false, "Automatically remove the container when it exits")
-	flags.BoolVarP(&opts.detach, "detach", "d", false, "Run container in background and print container ID")
-	flags.BoolVar(&opts.sigProxy, "sig-proxy", true, "Proxy received signals to the process")
-	flags.StringVar(&opts.name, "name", "", "Assign a name to the container")
-	flags.StringVar(&opts.detachKeys, "detach-keys", "", "Override the key sequence for detaching a container")
+	flags.BoolVar(&opts.autoRemove, "rm", false, "当容器退出时自动删除容器")
+	flags.BoolVarP(&opts.detach, "detach", "d", false, "在后台运行容器并打印容器ID")
+	flags.BoolVar(&opts.sigProxy, "sig-proxy", true, "代理指定的信号到容器运行进程")
+	flags.StringVar(&opts.name, "name", "", "为容器赋予一个名称")
+	flags.StringVar(&opts.detachKeys, "detach-keys", "", "覆盖从容器停止附加时的按键值顺序")
 
 	// Add an explicit help that doesn't have a `-h` to prevent the conflict
 	// with hostname
-	flags.Bool("help", false, "Print usage")
+	flags.Bool("help", false, "打印用途")
 
 	client.AddTrustedFlags(flags, true)
 	copts = runconfigopts.AddFlags(flags)
@@ -82,9 +82,9 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 
 	var (
 		flAttach                              *opttypes.ListOpts
-		ErrConflictAttachDetach               = fmt.Errorf("Conflicting options: -a and -d")
-		ErrConflictRestartPolicyAndAutoRemove = fmt.Errorf("Conflicting options: --restart and --rm")
-		ErrConflictDetachAutoRemove           = fmt.Errorf("Conflicting options: --rm and -d")
+		ErrConflictAttachDetach               = fmt.Errorf("选项冲突: -a and -d")
+		ErrConflictRestartPolicyAndAutoRemove = fmt.Errorf("选项冲突: --restart and --rm")
+		ErrConflictDetachAutoRemove           = fmt.Errorf("选项冲突: --rm and -d")
 	)
 
 	config, hostConfig, networkingConfig, err := runconfigopts.Parse(flags, copts)
@@ -96,7 +96,7 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 	}
 
 	if hostConfig.OomKillDisable != nil && *hostConfig.OomKillDisable && hostConfig.Memory == 0 {
-		fmt.Fprintf(stderr, "WARNING: Disabling the OOM killer on containers without setting a '-m/--memory' limit may be dangerous.\n")
+		fmt.Fprintf(stderr, "警告: 在容器上禁用OOM killer时没有设定'-m/--memory'限制将带来危险.\n")
 	}
 
 	if len(hostConfig.DNS) > 0 {
@@ -105,7 +105,7 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 		// set a DNS to a localhost address
 		for _, dnsIP := range hostConfig.DNS {
 			if dns.IsLocalhost(dnsIP) {
-				fmt.Fprintf(stderr, "WARNING: Localhost DNS setting (--dns=%s) may fail in containers.\n", dnsIP)
+				fmt.Fprintf(stderr, "警告: 本地的DNS设定(--dns=%s)在容器内有可能失效.\n", dnsIP)
 				break
 			}
 		}
@@ -248,7 +248,7 @@ func runRun(dockerCli *client.DockerCli, flags *pflag.FlagSet, opts *runOptions,
 
 	if (config.AttachStdin || config.AttachStdout || config.AttachStderr) && config.Tty && dockerCli.IsTerminalOut() {
 		if err := dockerCli.MonitorTtySize(ctx, createResponse.ID, false); err != nil {
-			fmt.Fprintf(stderr, "Error monitoring TTY size: %s\n", err)
+			fmt.Fprintf(stderr, "监视终端大小出错: %s\n", err)
 		}
 	}
 

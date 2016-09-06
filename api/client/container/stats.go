@@ -33,7 +33,7 @@ func NewStatsCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "stats [OPTIONS] [CONTAINER...]",
-		Short: "Display a live stream of container(s) resource usage statistics",
+		Short: "显示容器资源使用情况的实时流",
 		Args:  cli.RequiresMinArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -42,8 +42,8 @@ func NewStatsCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.all, "all", "a", false, "Show all containers (default shows just running)")
-	flags.BoolVar(&opts.noStream, "no-stream", false, "Disable streaming stats and only pull the first result")
+	flags.BoolVarP(&opts.all, "all", "a", false, "显示所有容器(默认仅显示运行状态的容器)")
+	flags.BoolVar(&opts.noStream, "no-stream", false, "禁用实时数据并下拉第一次返回的结果")
 	return cmd
 }
 
@@ -187,7 +187,7 @@ func runStats(dockerCli *client.DockerCli, opts *statsOptions) error {
 			fmt.Fprint(dockerCli.Out(), "\033[2J")
 			fmt.Fprint(dockerCli.Out(), "\033[H")
 		}
-		io.WriteString(w, "CONTAINER\tCPU %\tMEM USAGE / LIMIT\tMEM %\tNET I/O\tBLOCK I/O\tPIDS\n")
+		io.WriteString(w, "容器\tCPU %\t内存使用量/限制\t内存 %\t网络I/O\t磁盘I/O\t进程号\n")
 	}
 
 	for range time.Tick(500 * time.Millisecond) {

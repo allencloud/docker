@@ -34,7 +34,7 @@ func NewLogsCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "logs [OPTIONS] CONTAINER",
-		Short: "Fetch the logs of a container",
+		Short: "获取一个容器的运行日志",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.container = args[0]
@@ -43,11 +43,11 @@ func NewLogsCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.follow, "follow", "f", false, "Follow log output")
-	flags.StringVar(&opts.since, "since", "", "Show logs since timestamp")
-	flags.BoolVarP(&opts.timestamps, "timestamps", "t", false, "Show timestamps")
-	flags.BoolVar(&opts.details, "details", false, "Show extra details provided to logs")
-	flags.StringVar(&opts.tail, "tail", "all", "Number of lines to show from the end of the logs")
+	flags.BoolVarP(&opts.follow, "follow", "f", false, "跟踪容器日志输出")
+	flags.StringVar(&opts.since, "since", "", "从某一个时间戳开始获取日志")
+	flags.BoolVarP(&opts.timestamps, "timestamps", "t", false, "显示日志的时间戳")
+	flags.BoolVar(&opts.details, "details", false, "显示提供给日志的额外细节")
+	flags.StringVar(&opts.tail, "tail", "all", "从日志尾部往上显示制定数量行数的日志，all代表显示所有日志")
 	return cmd
 }
 
@@ -60,7 +60,7 @@ func runLogs(dockerCli *client.DockerCli, opts *logsOptions) error {
 	}
 
 	if !validDrivers[c.HostConfig.LogConfig.Type] {
-		return fmt.Errorf("\"logs\" command is supported only for \"json-file\" and \"journald\" logging drivers (got: %s)", c.HostConfig.LogConfig.Type)
+		return fmt.Errorf("\"logs\" 命令只支持\"json-file\"和\"journald\"日志驱动(当前日志驱动为: %s)", c.HostConfig.LogConfig.Type)
 	}
 
 	options := types.ContainerLogsOptions{

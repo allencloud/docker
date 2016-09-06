@@ -23,7 +23,7 @@ func NewLoadCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "load [OPTIONS]",
-		Short: "Load an image from a tar archive or STDIN",
+		Short: "从一个压缩包或者标准输入加载一个镜像",
 		Args:  cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runLoad(dockerCli, opts)
@@ -32,8 +32,8 @@ func NewLoadCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.StringVarP(&opts.input, "input", "i", "", "Read from tar archive file, instead of STDIN")
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Suppress the load output")
+	flags.StringVarP(&opts.input, "input", "i", "", "从压缩包中读取内容，而不是标准输入")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "压缩导入输出")
 
 	return cmd
 }

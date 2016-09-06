@@ -15,7 +15,7 @@ import (
 func NewPushCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "push [OPTIONS] NAME[:TAG]",
-		Short: "Push an image or a repository to a registry",
+		Short: "上传一个镜像到镜像仓库",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runPush(dockerCli, args[0])

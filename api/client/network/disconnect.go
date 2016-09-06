@@ -19,7 +19,7 @@ func newDisconnectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "disconnect [OPTIONS] NETWORK CONTAINER",
-		Short: "Disconnect a container from a network",
+		Short: "断开一个容器和一个网络的连接",
 		Args:  cli.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.network = args[0]
@@ -29,7 +29,7 @@ func newDisconnectCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.force, "force", "f", false, "Force the container to disconnect from a network")
+	flags.BoolVarP(&opts.force, "force", "f", false, "强制容器从网络断开连接")
 
 	return cmd
 }

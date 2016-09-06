@@ -33,7 +33,7 @@ func NewCobraAdaptor(clientFlags *cliflags.ClientFlags) CobraAdaptor {
 
 	var rootCmd = &cobra.Command{
 		Use:           "docker [OPTIONS]",
-		Short:         "A self-sufficient runtime for containers",
+		Short:         "一个为容器而生的运行时管理引擎",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -88,8 +88,8 @@ func NewCobraAdaptor(clientFlags *cliflags.ClientFlags) CobraAdaptor {
 	)
 	plugin.NewPluginCommand(rootCmd, dockerCli)
 
-	rootCmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
-	rootCmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
+	rootCmd.PersistentFlags().BoolP("help", "h", false, "打印用途")
+	rootCmd.PersistentFlags().MarkShorthandDeprecated("help", "请使用 --help")
 
 	return CobraAdaptor{
 		rootCmd:   rootCmd,
@@ -136,23 +136,23 @@ func (c CobraAdaptor) GetRootCommand() *cobra.Command {
 	return c.rootCmd
 }
 
-var usageTemplate = `Usage:	{{if not .HasSubCommands}}{{.UseLine}}{{end}}{{if .HasSubCommands}}{{ .CommandPath}} COMMAND{{end}}
+var usageTemplate = `用途:	{{if not .HasSubCommands}}{{.UseLine}}{{end}}{{if .HasSubCommands}}{{ .CommandPath}} COMMAND{{end}}
 
 {{ .Short | trim }}{{if gt .Aliases 0}}
 
-Aliases:
+别名:
   {{.NameAndAliases}}{{end}}{{if .HasExample}}
 
-Examples:
+案例:
 {{ .Example }}{{end}}{{if .HasFlags}}
 
-Options:
+选项:
 {{.Flags.FlagUsages | trimRightSpace}}{{end}}{{ if .HasAvailableSubCommands}}
 
-Commands:{{range .Commands}}{{if .IsAvailableCommand}}
+命令:{{range .Commands}}{{if .IsAvailableCommand}}
   {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasSubCommands }}
 
-Run '{{.CommandPath}} COMMAND --help' for more information on a command.{{end}}
+运行 '{{.CommandPath}} COMMAND --help' 来获取此命令的更多详细信息.{{end}}
 `
 
 var helpTemplate = `

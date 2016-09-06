@@ -16,7 +16,7 @@ import (
 func newScaleCommand(dockerCli *client.DockerCli) *cobra.Command {
 	return &cobra.Command{
 		Use:   "scale SERVICE=REPLICAS [SERVICE=REPLICAS...]",
-		Short: "Scale one or multiple services",
+		Short: "扩展一个或多个服务",
 		Args:  scaleArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runScale(dockerCli, args)
@@ -31,7 +31,7 @@ func scaleArgs(cmd *cobra.Command, args []string) error {
 	for _, arg := range args {
 		if parts := strings.SplitN(arg, "=", 2); len(parts) != 2 {
 			return fmt.Errorf(
-				"Invalid scale specifier '%s'.\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
+				"无效的扩展指定项 '%s'.\n查看 '%s --help'.\n\n用途:  %s\n\n%s",
 				arg,
 				cmd.CommandPath(),
 				cmd.UseLine(),
@@ -70,11 +70,11 @@ func runServiceScale(dockerCli *client.DockerCli, serviceID string, scale string
 
 	serviceMode := &service.Spec.Mode
 	if serviceMode.Replicated == nil {
-		return fmt.Errorf("scale can only be used with replicated mode")
+		return fmt.Errorf("扩展只能支持副本(replicated)模式的服务")
 	}
 	uintScale, err := strconv.ParseUint(scale, 10, 64)
 	if err != nil {
-		return fmt.Errorf("invalid replicas value %s: %s", scale, err.Error())
+		return fmt.Errorf("无效的副本数量值 %s: %s", scale, err.Error())
 	}
 	serviceMode.Replicated.Replicas = &uintScale
 
@@ -83,6 +83,7 @@ func runServiceScale(dockerCli *client.DockerCli, serviceID string, scale string
 		return err
 	}
 
-	fmt.Fprintf(dockerCli.Out(), "%s scaled to %s\n", serviceID, scale)
+	fmt.Fprintf(dockerCli.Out(), "%s 已经扩展至 %s\n", serviceID, scale)
+
 	return nil
 }
