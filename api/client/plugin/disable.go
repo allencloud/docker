@@ -15,7 +15,7 @@ import (
 func newDisableCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "disable PLUGIN",
-		Short: "Disable a plugin",
+		Short: "禁用指定插件",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runDisable(dockerCli, args[0])
@@ -35,7 +35,7 @@ func runDisable(dockerCli *client.DockerCli, name string) error {
 	}
 	ref, ok := named.(reference.NamedTagged)
 	if !ok {
-		return fmt.Errorf("invalid name: %s", named.String())
+		return fmt.Errorf("无效的名称: %s", named.String())
 	}
 	if err := dockerCli.Client().PluginDisable(context.Background(), ref.String()); err != nil {
 		return err

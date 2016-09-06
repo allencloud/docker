@@ -23,8 +23,8 @@ func NewPortCommand(dockerCli *client.DockerCli) *cobra.Command {
 	var opts portOptions
 
 	cmd := &cobra.Command{
-		Use:   "port CONTAINER [PRIVATE_PORT[/PROTO]]",
-		Short: "List port mappings or a specific mapping for the container",
+		Use:   "port CONTAINER [私有端口[/协议]]",
+		Short: "罗列为容器指定的所有端口映射信息",
 		Args:  cli.RequiresRangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.container = args[0]
@@ -65,7 +65,7 @@ func runPort(dockerCli *client.DockerCli, opts *portOptions) error {
 			}
 			return nil
 		}
-		return fmt.Errorf("Error: No public port '%s' published for %s", natPort, opts.container)
+		return fmt.Errorf("错误: 没有暴露端口'%s'给容器 %s", natPort, opts.container)
 	}
 
 	for from, frontends := range c.NetworkSettings.Ports {

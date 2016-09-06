@@ -19,7 +19,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "inspect [OPTIONS] VOLUME [VOLUME...]",
-		Short: "Display detailed information on one or more volumes",
+		Short: "显示一个或多个存储卷的详细信息",
 		Long:  inspectDescription,
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -28,7 +28,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&opts.format, "format", "f", "", "Format the output using the given go template")
+	cmd.Flags().StringVarP(&opts.format, "format", "f", "", "基于指定的Go语言模板格式化命令输出内容")
 
 	return cmd
 }

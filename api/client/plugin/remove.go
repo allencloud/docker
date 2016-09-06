@@ -24,7 +24,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "rm [OPTIONS] PLUGIN [PLUGIN...]",
-		Short:   "Remove one or more plugins",
+		Short:   "删除一个或多个插件",
 		Aliases: []string{"remove"},
 		Args:    cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -34,7 +34,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.force, "force", "f", false, "Force the removal of an active plugin")
+	flags.BoolVarP(&opts.force, "force", "f", false, "强制删除一个启用的插件")
 	return cmd
 }
 
@@ -52,7 +52,7 @@ func runRemove(dockerCli *client.DockerCli, opts *rmOptions) error {
 		}
 		ref, ok := named.(reference.NamedTagged)
 		if !ok {
-			return fmt.Errorf("invalid name: %s", named.String())
+			return fmt.Errorf("无效的名称: %s", named.String())
 		}
 		// TODO: pass names to api instead of making multiple api calls
 		if err := dockerCli.Client().PluginRemove(ctx, ref.String(), types.PluginRemoveOptions{Force: opts.force}); err != nil {

@@ -32,7 +32,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
 		Aliases: []string{"list"},
-		Short:   "List networks",
+		Short:   "罗列所有网络",
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(dockerCli, opts)
@@ -40,10 +40,10 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display network IDs")
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Do not truncate the output")
-	flags.StringVar(&opts.format, "format", "", "Pretty-print networks using a Go template")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Provide filter values (i.e. 'dangling=true')")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示网络ID")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断命令输出内容")
+	flags.StringVar(&opts.format, "format", "", "通过一个Go 语言模板来打印网络信息")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "提供一些过滤值(比如 'dangling=true')")
 
 	return cmd
 }

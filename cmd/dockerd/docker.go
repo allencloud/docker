@@ -32,7 +32,7 @@ func newDaemonCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:           "dockerd [OPTIONS]",
-		Short:         "A self-sufficient runtime for containers.",
+		Short:         "一个为容器而生的运行时管理引擎.",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Args:          cli.NoArgs,
@@ -44,8 +44,8 @@ func newDaemonCommand() *cobra.Command {
 	cli.SetupRootCommand(cmd)
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.version, "version", "v", false, "Print version information and quit")
-	flags.StringVar(&opts.configFile, flagDaemonConfigFile, defaultDaemonConfigFile, "Daemon configuration file")
+	flags.BoolVarP(&opts.version, "version", "v", false, "输出版本信息并配置")
+	flags.StringVar(&opts.configFile, flagDaemonConfigFile, defaultDaemonConfigFile, "Docker引擎使用配置文件的路径信息")
 	opts.common.InstallFlags(flags)
 	opts.daemonConfig.InstallFlags(flags)
 	installServiceFlags(flags)
@@ -79,9 +79,9 @@ func runDaemon(opts daemonOptions) error {
 
 func showVersion() {
 	if utils.ExperimentalBuild() {
-		fmt.Printf("Docker version %s, build %s, experimental\n", dockerversion.Version, dockerversion.GitCommit)
+		fmt.Printf("Docker引擎版本 %s, 构建 %s, 实验版本\n", dockerversion.Version, dockerversion.GitCommit)
 	} else {
-		fmt.Printf("Docker version %s, build %s\n", dockerversion.Version, dockerversion.GitCommit)
+		fmt.Printf("Docker引擎版本 %s, 构建 %s\n", dockerversion.Version, dockerversion.GitCommit)
 	}
 }
 

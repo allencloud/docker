@@ -23,7 +23,7 @@ func NewKillCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "kill [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Kill one or more running containers",
+		Short: "终止一个或多个运行的容器",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -32,7 +32,7 @@ func NewKillCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.signal, "signal", "s", "KILL", "Signal to send to the container")
+	flags.StringVarP(&opts.signal, "signal", "s", "KILL", "发送给容器的信号")
 	return cmd
 }
 

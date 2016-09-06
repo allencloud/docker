@@ -23,7 +23,7 @@ func newDockerCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:              "docker [OPTIONS] COMMAND [arg...]",
-		Short:            "A self-sufficient runtime for containers.",
+		Short:            "一个为容器而生的运行时管理引擎 runtime for containers.",
 		SilenceUsage:     true,
 		SilenceErrors:    true,
 		TraverseChildren: true,
@@ -46,8 +46,8 @@ func newDockerCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cli.SetupRootCommand(cmd)
 
 	flags = cmd.Flags()
-	flags.BoolVarP(&opts.Version, "version", "v", false, "Print version information and quit")
-	flags.StringVar(&opts.ConfigDir, "config", cliconfig.ConfigDir(), "Location of client config files")
+	flags.BoolVarP(&opts.Version, "version", "v", false, "输出版本信息并退出")
+	flags.StringVar(&opts.ConfigDir, "config", cliconfig.ConfigDir(), "客户端配置文件的路径信息")
 	opts.Common.InstallFlags(flags)
 
 	cmd.SetOutput(dockerCli.Out())

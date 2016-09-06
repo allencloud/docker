@@ -22,7 +22,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "rm [OPTIONS] VOLUME [VOLUME...]",
 		Aliases: []string{"remove"},
-		Short:   "Remove one or more volumes",
+		Short:   "删除一个或多个存储卷",
 		Long:    removeDescription,
 		Example: removeExample,
 		Args:    cli.RequiresMinArgs(1),
@@ -33,7 +33,7 @@ func newRemoveCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.force, "force", "f", false, "Force the removal of one or more volumes")
+	flags.BoolVarP(&opts.force, "force", "f", false, "强制删除一个或多个存储卷")
 
 	return cmd
 }

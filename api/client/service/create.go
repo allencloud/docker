@@ -15,7 +15,7 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create [OPTIONS] IMAGE [COMMAND] [ARG...]",
-		Short: "Create a new service",
+		Short: "创建一个新的服务",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.image = args[0]
@@ -26,16 +26,16 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 	flags := cmd.Flags()
-	flags.StringVar(&opts.mode, flagMode, "replicated", "Service mode (replicated or global)")
+	flags.StringVar(&opts.mode, flagMode, "replicated", "服务类型: 副本(replicated)/全局(global)")
 	addServiceFlags(cmd, opts)
 
-	flags.VarP(&opts.labels, flagLabel, "l", "Service labels")
-	flags.Var(&opts.containerLabels, flagContainerLabel, "Container labels")
-	flags.VarP(&opts.env, flagEnv, "e", "Set environment variables")
-	flags.Var(&opts.mounts, flagMount, "Attach a mount to the service")
-	flags.StringSliceVar(&opts.constraints, flagConstraint, []string{}, "Placement constraints")
-	flags.StringSliceVar(&opts.networks, flagNetwork, []string{}, "Network attachments")
-	flags.VarP(&opts.endpoint.ports, flagPublish, "p", "Publish a port as a node port")
+	flags.VarP(&opts.labels, flagLabel, "l", "服务自身标签")
+	flags.Var(&opts.containerLabels, flagContainerLabel, "服务中容器的标签")
+	flags.VarP(&opts.env, flagEnv, "e", "设置服务环境变量")
+	flags.Var(&opts.mounts, flagMount, "为服务添加一个挂载项")
+	flags.StringSliceVar(&opts.constraints, flagConstraint, []string{}, "服务节点安放的限制条件")
+	flags.StringSliceVar(&opts.networks, flagNetwork, []string{}, "网络附加信息")
+	flags.VarP(&opts.endpoint.ports, flagPublish, "p", "将服务的一个端口暴露为一个节点端口")
 
 	flags.SetInterspersed(false)
 	return cmd

@@ -35,7 +35,7 @@ func NewSearchCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "search [OPTIONS] TERM",
-		Short: "Search the Docker Hub for images",
+		Short: "在 Docker Hub(Docker官方镜像仓库)中搜索镜像",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.term = args[0]
@@ -45,15 +45,15 @@ func NewSearchCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Don't truncate output")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Filter output based on conditions provided")
-	flags.IntVar(&opts.limit, "limit", registry.DefaultSearchLimit, "Max number of search results")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断命令输出内容")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "基于指定条件过滤命令输出内容")
+	flags.IntVar(&opts.limit, "limit", registry.DefaultSearchLimit, "搜索结果的最大数")
 
-	flags.BoolVar(&opts.automated, "automated", false, "Only show automated builds")
-	flags.UintVarP(&opts.stars, "stars", "s", 0, "Only displays with at least x stars")
+	flags.BoolVar(&opts.automated, "automated", false, "只显示自动化构建出来的镜像")
+	flags.UintVarP(&opts.stars, "stars", "s", 0, "只显示至少有 x 个用户星星的镜像")
 
-	flags.MarkDeprecated("automated", "use --filter=automated=true instead")
-	flags.MarkDeprecated("stars", "use --filter=stars=3 instead")
+	flags.MarkDeprecated("automated", "使用 --filter=automated=true ")
+	flags.MarkDeprecated("stars", "使用 --filter=stars=3 ")
 
 	return cmd
 }
@@ -101,7 +101,7 @@ func runSearch(dockerCli *client.DockerCli, opts searchOptions) error {
 	sort.Sort(results)
 
 	w := tabwriter.NewWriter(dockerCli.Out(), 10, 1, 3, ' ', 0)
-	fmt.Fprintf(w, "NAME\tDESCRIPTION\tSTARS\tOFFICIAL\tAUTOMATED\n")
+	fmt.Fprintf(w, "名称\t描述\t星星数\t是否官方\t是否自动构建\n")
 	for _, res := range results {
 		// --automated and -s, --stars are deprecated since Docker 1.12
 		if (opts.automated && !res.IsAutomated) || (int(opts.stars) > res.StarCount) {

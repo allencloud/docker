@@ -23,7 +23,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "inspect [OPTIONS] PLUGIN [PLUGIN...]",
-		Short: "Display detailed information on one or more plugins",
+		Short: "显示一个或多个插件的详细信息",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.pluginNames = args
@@ -32,7 +32,7 @@ func newInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.format, "format", "f", "", "Format the output using the given go template")
+	flags.StringVarP(&opts.format, "format", "f", "", "通过指定的Go语言模板格式化命令输出内容")
 	return cmd
 }
 

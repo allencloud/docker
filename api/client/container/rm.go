@@ -26,7 +26,7 @@ func NewRmCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "rm [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Remove one or more containers",
+		Short: "删除一个或多个容器",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -35,9 +35,9 @@ func NewRmCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.rmVolumes, "volumes", "v", false, "Remove the volumes associated with the container")
-	flags.BoolVarP(&opts.rmLink, "link", "l", false, "Remove the specified link")
-	flags.BoolVarP(&opts.force, "force", "f", false, "Force the removal of a running container (uses SIGKILL)")
+	flags.BoolVarP(&opts.rmVolumes, "volumes", "v", false, "删除容器时同时删除容器相关的存储卷")
+	flags.BoolVarP(&opts.rmLink, "link", "l", false, "删除指定的链接")
+	flags.BoolVarP(&opts.force, "force", "f", false, "强制删除一个运行的容器(使用信号SIGKILL)")
 	return cmd
 }
 
@@ -47,7 +47,7 @@ func runRm(dockerCli *client.DockerCli, opts *rmOptions) error {
 	var errs []string
 	for _, name := range opts.containers {
 		if name == "" {
-			return fmt.Errorf("Container name cannot be empty")
+			return fmt.Errorf("容器名不能为空")
 		}
 		name = strings.Trim(name, "/")
 

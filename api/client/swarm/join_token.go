@@ -17,14 +17,14 @@ func newJoinTokenCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "join-token [OPTIONS] (worker|manager)",
-		Short: "Manage join tokens",
+		Short: "管理加群令牌",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			worker := args[0] == "worker"
 			manager := args[0] == "manager"
 
 			if !worker && !manager {
-				return errors.New("unknown role " + args[0])
+				return errors.New("未知的角色 " + args[0])
 			}
 
 			client := dockerCli.Client()
@@ -46,7 +46,7 @@ func newJoinTokenCommand(dockerCli *client.DockerCli) *cobra.Command {
 					return err
 				}
 				if !quiet {
-					fmt.Fprintf(dockerCli.Out(), "Succesfully rotated %s join token.\n\n", args[0])
+					fmt.Fprintf(dockerCli.Out(), "成功轮换 %s 加入令牌。\n\n", args[0])
 				}
 			}
 
@@ -73,8 +73,8 @@ func newJoinTokenCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVar(&rotate, flagRotate, false, "Rotate join token")
-	flags.BoolVarP(&quiet, flagQuiet, "q", false, "Only display token")
+	flags.BoolVar(&rotate, flagRotate, false, "轮换加入令牌")
+	flags.BoolVarP(&quiet, flagQuiet, "q", false, "仅显示令牌")
 
 	return cmd
 }
@@ -94,10 +94,10 @@ func printJoinCommand(ctx context.Context, dockerCli *client.DockerCli, nodeID s
 
 	if node.ManagerStatus != nil {
 		if worker {
-			fmt.Fprintf(dockerCli.Out(), "To add a worker to this swarm, run the following command:\n\n    docker swarm join \\\n    --token %s \\\n    %s\n\n", swarm.JoinTokens.Worker, node.ManagerStatus.Addr)
+			fmt.Fprintf(dockerCli.Out(), "如需在此Swarm集群中加入一个工作者，在工作者节点上运行以下命令:\n\n    docker swarm join \\\n    --token %s \\\n    %s\n\n", swarm.JoinTokens.Worker, node.ManagerStatus.Addr)
 		}
 		if manager {
-			fmt.Fprintf(dockerCli.Out(), "To add a manager to this swarm, run the following command:\n\n    docker swarm join \\\n    --token %s \\\n    %s\n\n", swarm.JoinTokens.Manager, node.ManagerStatus.Addr)
+			fmt.Fprintf(dockerCli.Out(), "如需在此Swarm集群中加入一个管理者，在管理者节点上运行以下命令:\n\n    docker swarm join \\\n    --token %s \\\n    %s\n\n", swarm.JoinTokens.Manager, node.ManagerStatus.Addr)
 		}
 	}
 

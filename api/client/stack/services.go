@@ -31,7 +31,7 @@ func newServicesCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "services [OPTIONS] STACK",
-		Short: "List the services in the stack",
+		Short: "在stack中罗列所有任务",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.namespace = args[0]
@@ -39,8 +39,8 @@ func newServicesCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display IDs")
-	flags.VarP(&opts.filter, "filter", "f", "Filter output based on conditions provided")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示数字ID")
+	flags.VarP(&opts.filter, "filter", "f", "基于指定条件过滤命令输出内容")
 
 	return cmd
 }
@@ -61,7 +61,7 @@ func runServices(dockerCli *client.DockerCli, opts servicesOptions) error {
 
 	// if no services in this stack, print message and exit 0
 	if len(services) == 0 {
-		fmt.Fprintf(out, "Nothing found in stack: %s\n", opts.namespace)
+		fmt.Fprintf(out, "在stack中没有找到任何内容: %s\n", opts.namespace)
 		return nil
 	}
 

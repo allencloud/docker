@@ -30,15 +30,15 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
 		Aliases: []string{"list"},
-		Short:   "List nodes in the swarm",
+		Short:   "在Swarm集群中罗列所有的节点",
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(dockerCli, opts)
 		},
 	}
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display IDs")
-	flags.VarP(&opts.filter, "filter", "f", "Filter output based on conditions provided")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "只显示节点的ID。")
+	flags.VarP(&opts.filter, "filter", "f", "基于指定条件过滤输出。")
 
 	return cmd
 }
@@ -74,7 +74,7 @@ func printTable(out io.Writer, nodes []swarm.Node, info types.Info) {
 	// Ignore flushing errors
 	defer writer.Flush()
 
-	fmt.Fprintf(writer, listItemFmt, "ID", "HOSTNAME", "STATUS", "AVAILABILITY", "MANAGER STATUS")
+	fmt.Fprintf(writer, listItemFmt, "ID", "主机名", "状态", "可达性", "管理者状态")
 	for _, node := range nodes {
 		name := node.Description.Hostname
 		availability := string(node.Spec.Availability)

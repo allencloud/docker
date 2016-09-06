@@ -33,7 +33,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
 		Aliases: []string{"list"},
-		Short:   "List volumes",
+		Short:   "罗列所有存储卷",
 		Long:    listDescription,
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -42,9 +42,9 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "Only display volume names")
-	flags.StringVar(&opts.format, "format", "", "Pretty-print networks using a Go template")
-	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "Provide filter values (e.g. 'dangling=true')")
+	flags.BoolVarP(&opts.quiet, "quiet", "q", false, "仅显示存储卷名称")
+	flags.StringVar(&opts.format, "format", "", "使用一个Go语言模板打印存储卷信息")
+	flags.StringSliceVarP(&opts.filter, "filter", "f", []string{}, "提供过滤信息 (比如 'dangling=true')")
 
 	return cmd
 }

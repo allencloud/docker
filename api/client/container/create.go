@@ -33,7 +33,7 @@ func NewCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create [OPTIONS] IMAGE [COMMAND] [ARG...]",
-		Short: "Create a new container",
+		Short: "创建一个新的容器，属于容器实体，未开始运行",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			copts.Image = args[0]
@@ -47,11 +47,11 @@ func NewCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	flags := cmd.Flags()
 	flags.SetInterspersed(false)
 
-	flags.StringVar(&opts.name, "name", "", "Assign a name to the container")
+	flags.StringVar(&opts.name, "name", "", "为容器授予一个名称")
 
 	// Add an explicit help that doesn't have a `-h` to prevent the conflict
 	// with hostname
-	flags.Bool("help", false, "Print usage")
+	flags.Bool("help", false, "打印命令用途")
 
 	client.AddTrustedFlags(flags, true)
 	copts = runconfigopts.AddFlags(flags)
@@ -119,7 +119,7 @@ func (cid *cidFile) Close() error {
 
 	if !cid.written {
 		if err := os.Remove(cid.path); err != nil {
-			return fmt.Errorf("failed to remove the CID file '%s': %s \n", cid.path, err)
+			return fmt.Errorf("删除容器ID文件'%s'失败: %s \n", cid.path, err)
 		}
 	}
 
@@ -128,7 +128,7 @@ func (cid *cidFile) Close() error {
 
 func (cid *cidFile) Write(id string) error {
 	if _, err := cid.file.Write([]byte(id)); err != nil {
-		return fmt.Errorf("Failed to write the container ID to the file: %s", err)
+		return fmt.Errorf("写容器ID至容器ID文件失败: %s", err)
 	}
 	cid.written = true
 	return nil
@@ -136,12 +136,12 @@ func (cid *cidFile) Write(id string) error {
 
 func newCIDFile(path string) (*cidFile, error) {
 	if _, err := os.Stat(path); err == nil {
-		return nil, fmt.Errorf("Container ID file found, make sure the other container isn't running or delete %s", path)
+		return nil, fmt.Errorf("容器ID文件已找到，请确保其他的容器并没有在运行或被删除 %s", path)
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create the container ID file: %s", err)
+		return nil, fmt.Errorf("创建容器ID文件失败: %s", err)
 	}
 
 	return &cidFile{path: path, file: f}, nil
@@ -183,7 +183,7 @@ func createContainer(ctx context.Context, dockerCli *client.DockerCli, config *c
 	//if image not found try to pull it
 	if err != nil {
 		if apiclient.IsErrImageNotFound(err) && ref != nil {
-			fmt.Fprintf(stderr, "Unable to find image '%s' locally\n", ref.String())
+			fmt.Fprintf(stderr, "本地无法找到镜像 '%s'\n", ref.String())
 
 			// we don't want to write to stdout anything apart from container.ID
 			if err = pullImage(ctx, dockerCli, config.Image, stderr); err != nil {
@@ -206,7 +206,7 @@ func createContainer(ctx context.Context, dockerCli *client.DockerCli, config *c
 	}
 
 	for _, warning := range response.Warnings {
-		fmt.Fprintf(stderr, "WARNING: %s\n", warning)
+		fmt.Fprintf(stderr, "警告: %s\n", warning)
 	}
 	if containerIDFile != nil {
 		if err = containerIDFile.Write(response.ID); err != nil {

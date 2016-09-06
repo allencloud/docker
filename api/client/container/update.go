@@ -38,7 +38,7 @@ func NewUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Update configuration of one or more containers",
+		Short: "更新一个或多个容器的配置信息",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.containers = args
@@ -48,17 +48,17 @@ func NewUpdateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.Uint16Var(&opts.blkioWeight, "blkio-weight", 0, "Block IO (relative weight), between 10 and 1000")
-	flags.Int64Var(&opts.cpuPeriod, "cpu-period", 0, "Limit CPU CFS (Completely Fair Scheduler) period")
-	flags.Int64Var(&opts.cpuQuota, "cpu-quota", 0, "Limit CPU CFS (Completely Fair Scheduler) quota")
-	flags.StringVar(&opts.cpusetCpus, "cpuset-cpus", "", "CPUs in which to allow execution (0-3, 0,1)")
-	flags.StringVar(&opts.cpusetMems, "cpuset-mems", "", "MEMs in which to allow execution (0-3, 0,1)")
-	flags.Int64VarP(&opts.cpuShares, "cpu-shares", "c", 0, "CPU shares (relative weight)")
-	flags.StringVarP(&opts.memoryString, "memory", "m", "", "Memory limit")
-	flags.StringVar(&opts.memoryReservation, "memory-reservation", "", "Memory soft limit")
-	flags.StringVar(&opts.memorySwap, "memory-swap", "", "Swap limit equal to memory plus swap: '-1' to enable unlimited swap")
-	flags.StringVar(&opts.kernelMemory, "kernel-memory", "", "Kernel memory limit")
-	flags.StringVar(&opts.restartPolicy, "restart", "", "Restart policy to apply when a container exits")
+	flags.Uint16Var(&opts.blkioWeight, "blkio-weight", 0, "磁盘IO设置(相对值),从10到1000")
+	flags.Int64Var(&opts.cpuPeriod, "cpu-period", 0, "限制CPU绝对公平调度算法（CFS）的时间周期")
+	flags.Int64Var(&opts.cpuQuota, "cpu-quota", 0, "限制CPU绝对公平调度算法（CFS）的时间限额")
+	flags.StringVar(&opts.cpusetCpus, "cpuset-cpus", "", "允许容器执行的CPU核指定(0-3,0,1): 0-3代表运行运行在0,1,2,3这4个核上")
+	flags.StringVar(&opts.cpusetMems, "cpuset-mems", "", "允许容器执行的CPU内存所在核指定(0-3,0,1): 0-3代表运行运行在0,1,2,3这4个核上")
+	flags.Int64VarP(&opts.cpuShares, "cpu-shares", "c", 0, "CPU计算资源的值(相对值)")
+	flags.StringVarP(&opts.memoryString, "memory", "m", "", "内存限制")
+	flags.StringVar(&opts.memoryReservation, "memory-reservation", "", "内存软限制")
+	flags.StringVar(&opts.memorySwap, "memory-swap", "", "交换内存限制 等于 实际内存 ＋ 交换区内存: '-1' 代表启用不受限的交换区内存")
+	flags.StringVar(&opts.kernelMemory, "kernel-memory", "", "内核内存限制")
+	flags.StringVar(&opts.restartPolicy, "restart", "", "当容器退出时应用在容器上的重启策略")
 
 	return cmd
 }
@@ -67,7 +67,7 @@ func runUpdate(dockerCli *client.DockerCli, opts *updateOptions) error {
 	var err error
 
 	if opts.nFlag == 0 {
-		return fmt.Errorf("You must provide one or more flags when using this command.")
+		return fmt.Errorf("当使用此命令时，您必须提供一个或多个命令参数。")
 	}
 
 	var memory int64

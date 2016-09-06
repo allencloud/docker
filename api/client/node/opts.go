@@ -41,7 +41,7 @@ func (opts *nodeOptions) ToNodeSpec() (swarm.NodeSpec, error) {
 		spec.Role = swarm.NodeRoleManager
 	case "":
 	default:
-		return swarm.NodeSpec{}, fmt.Errorf("invalid role %q, only worker and manager are supported", opts.role)
+		return swarm.NodeSpec{}, fmt.Errorf("无效的节点角色 %q, 当前Swarm只支持工作者和管理者", opts.role)
 	}
 
 	switch swarm.NodeAvailability(strings.ToLower(opts.availability)) {
@@ -53,7 +53,7 @@ func (opts *nodeOptions) ToNodeSpec() (swarm.NodeSpec, error) {
 		spec.Availability = swarm.NodeAvailabilityDrain
 	case "":
 	default:
-		return swarm.NodeSpec{}, fmt.Errorf("invalid availability %q, only active, pause and drain are supported", opts.availability)
+		return swarm.NodeSpec{}, fmt.Errorf("无效的节点可达性 %q, 只支持活跃，暂停，维护状态", opts.availability)
 	}
 
 	return spec, nil

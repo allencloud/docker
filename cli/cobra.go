@@ -13,8 +13,8 @@ func SetupRootCommand(rootCmd *cobra.Command) {
 	rootCmd.SetHelpTemplate(helpTemplate)
 	rootCmd.SetFlagErrorFunc(FlagErrorFunc)
 
-	rootCmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
-	rootCmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
+	rootCmd.PersistentFlags().BoolP("help", "h", false, "打印命令用途")
+	rootCmd.PersistentFlags().MarkShorthandDeprecated("help", "请使用 --help")
 }
 
 // FlagErrorFunc prints an error message which matches the format of the
@@ -34,23 +34,23 @@ func FlagErrorFunc(cmd *cobra.Command, err error) error {
 	}
 }
 
-var usageTemplate = `Usage:	{{if not .HasSubCommands}}{{.UseLine}}{{end}}{{if .HasSubCommands}}{{ .CommandPath}} COMMAND{{end}}
+var usageTemplate = `用途:	{{if not .HasSubCommands}}{{.UseLine}}{{end}}{{if .HasSubCommands}}{{ .CommandPath}} COMMAND{{end}}
 
 {{ .Short | trim }}{{if gt .Aliases 0}}
 
-Aliases:
+别名:
   {{.NameAndAliases}}{{end}}{{if .HasExample}}
 
-Examples:
+案例:
 {{ .Example }}{{end}}{{if .HasFlags}}
 
-Options:
+选项:
 {{.Flags.FlagUsages | trimRightSpace}}{{end}}{{ if .HasAvailableSubCommands}}
 
-Commands:{{range .Commands}}{{if .IsAvailableCommand}}
+命令:{{range .Commands}}{{if .IsAvailableCommand}}
   {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasSubCommands }}
 
-Run '{{.CommandPath}} COMMAND --help' for more information on a command.{{end}}
+运行 '{{.CommandPath}} COMMAND --help' 来获取一个命令的更多信息.{{end}}
 `
 
 var helpTemplate = `

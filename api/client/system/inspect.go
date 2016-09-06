@@ -26,7 +26,7 @@ func NewInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "inspect [OPTIONS] CONTAINER|IMAGE|TASK [CONTAINER|IMAGE|TASK...]",
-		Short: "Return low-level information on a container, image or task",
+		Short: "返回一个容器，或镜像，或任务的底层具体信息",
 		Args:  cli.RequiresMinArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.ids = args
@@ -35,9 +35,9 @@ func NewInspectCommand(dockerCli *client.DockerCli) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.format, "format", "f", "", "Format the output using the given go template")
-	flags.StringVar(&opts.inspectType, "type", "", "Return JSON for specified type")
-	flags.BoolVarP(&opts.size, "size", "s", false, "Display total file sizes if the type is container")
+	flags.StringVarP(&opts.format, "format", "f", "", "基于指定的Go语言模板格式化命令输出内容")
+	flags.StringVar(&opts.inspectType, "type", "", "为指定的类型返回JSON内容")
+	flags.BoolVarP(&opts.size, "size", "s", false, "如果类型为容器，显示所有的文件大小信息")
 
 	return cmd
 }
@@ -48,7 +48,7 @@ func runInspect(dockerCli *client.DockerCli, opts inspectOptions) error {
 	case "", "container", "image", "node", "network", "service", "volume", "task":
 		elementSearcher = inspectAll(context.Background(), dockerCli, opts.size, opts.inspectType)
 	default:
-		return fmt.Errorf("%q is not a valid value for --type", opts.inspectType)
+		return fmt.Errorf("对 --type而言，%q 不是一个有效的值", opts.inspectType)
 	}
 	return inspect.Inspect(dockerCli.Out(), opts.ids, opts.format, elementSearcher)
 }
@@ -127,10 +127,10 @@ func inspectAll(ctx context.Context, dockerCli *client.DockerCli, getSize bool, 
 				return v, raw, err
 			}
 			if !inspectData.IsSizeSupported {
-				fmt.Fprintf(dockerCli.Err(), "WARNING: --size ignored for %s\n", inspectData.ObjectType)
+				fmt.Fprintf(dockerCli.Err(), "警告: --size 被忽略 %s\n", inspectData.ObjectType)
 			}
 			return v, raw, err
 		}
-		return nil, nil, fmt.Errorf("Error: No such object: %s", ref)
+		return nil, nil, fmt.Errorf("错误: 没有该项目: %s", ref)
 	}
 }

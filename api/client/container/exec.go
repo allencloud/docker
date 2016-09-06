@@ -29,7 +29,7 @@ func NewExecCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "exec [OPTIONS] CONTAINER COMMAND [ARG...]",
-		Short: "Run a command in a running container",
+		Short: "在一个运行的容器运行用户指定的命令，常用来调试",
 		Args:  cli.RequiresMinArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			container := args[0]
@@ -41,12 +41,12 @@ func NewExecCommand(dockerCli *client.DockerCli) *cobra.Command {
 	flags := cmd.Flags()
 	flags.SetInterspersed(false)
 
-	flags.StringVarP(&opts.detachKeys, "detach-keys", "", "", "Override the key sequence for detaching a container")
-	flags.BoolVarP(&opts.interactive, "interactive", "i", false, "Keep STDIN open even if not attached")
-	flags.BoolVarP(&opts.tty, "tty", "t", false, "Allocate a pseudo-TTY")
-	flags.BoolVarP(&opts.detach, "detach", "d", false, "Detached mode: run command in the background")
-	flags.StringVarP(&opts.user, "user", "u", "", "Username or UID (format: <name|uid>[:<group|gid>])")
-	flags.BoolVarP(&opts.privileged, "privileged", "", false, "Give extended privileges to the command")
+	flags.StringVarP(&opts.detachKeys, "detach-keys", "", "", "覆盖从一个容器停止附加时的退出按键")
+	flags.BoolVarP(&opts.interactive, "interactive", "i", false, "即使容器没有被附加标准输出，标准错误，也爆出输出输入的畅通")
+	flags.BoolVarP(&opts.tty, "tty", "t", false, "分配一个伪终端")
+	flags.BoolVarP(&opts.detach, "detach", "d", false, "后台模式: 在后台运行用户指定的命令")
+	flags.StringVarP(&opts.user, "user", "u", "", "用户名或用户名ID (格式: <用户名|用户名ID>[:<组|组ID>])")
+	flags.BoolVarP(&opts.privileged, "privileged", "", false, "为运行命令授予格外的特权")
 
 	return cmd
 }
@@ -74,7 +74,7 @@ func runExec(dockerCli *client.DockerCli, opts *execOptions, container string, e
 
 	execID := response.ID
 	if execID == "" {
-		fmt.Fprintf(dockerCli.Out(), "exec ID empty")
+		fmt.Fprintf(dockerCli.Out(), "执行ID为空")
 		return nil
 	}
 
@@ -129,7 +129,7 @@ func runExec(dockerCli *client.DockerCli, opts *execOptions, container string, e
 
 	if execConfig.Tty && dockerCli.IsTerminalIn() {
 		if err := dockerCli.MonitorTtySize(ctx, execID, true); err != nil {
-			fmt.Fprintf(dockerCli.Err(), "Error monitoring TTY size: %s\n", err)
+			fmt.Fprintf(dockerCli.Err(), "监听TTY规格出错: %s\n", err)
 		}
 	}
 

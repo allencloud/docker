@@ -722,10 +722,10 @@ func (f *FlagSet) setFlag(flag *Flag, value string, origArg string) error {
 	f.actual[f.normalizeFlagName(flag.Name)] = flag
 	flag.Changed = true
 	if len(flag.Deprecated) > 0 {
-		fmt.Fprintf(os.Stderr, "Flag --%s has been deprecated, %s\n", flag.Name, flag.Deprecated)
+		fmt.Fprintf(os.Stderr, "命令行参数 --%s 已经被废弃, %s\n", flag.Name, flag.Deprecated)
 	}
 	if len(flag.ShorthandDeprecated) > 0 && containsShorthand(origArg, flag.Shorthand) {
-		fmt.Fprintf(os.Stderr, "Flag shorthand -%s has been deprecated, %s\n", flag.Shorthand, flag.ShorthandDeprecated)
+		fmt.Fprintf(os.Stderr, "命令行参数缩写 -%s 已经被废弃, %s\n", flag.Shorthand, flag.ShorthandDeprecated)
 	}
 	return nil
 }

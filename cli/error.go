@@ -29,5 +29,5 @@ type StatusError struct {
 }
 
 func (e StatusError) Error() string {
-	return fmt.Sprintf("Status: %s, Code: %d", e.Status, e.StatusCode)
+	return fmt.Sprintf("状态: %s, 状态码: %d", e.Status, e.StatusCode)
 }

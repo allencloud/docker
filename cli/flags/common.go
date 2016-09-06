@@ -52,21 +52,21 @@ func (commonOpts *CommonOptions) InstallFlags(flags *pflag.FlagSet) {
 		dockerCertPath = cliconfig.ConfigDir()
 	}
 
-	flags.BoolVarP(&commonOpts.Debug, "debug", "D", false, "Enable debug mode")
-	flags.StringVarP(&commonOpts.LogLevel, "log-level", "l", "info", "Set the logging level")
-	flags.BoolVar(&commonOpts.TLS, "tls", false, "Use TLS; implied by --tlsverify")
-	flags.BoolVar(&commonOpts.TLSVerify, FlagTLSVerify, dockerTLSVerify, "Use TLS and verify the remote")
+	flags.BoolVarP(&commonOpts.Debug, "debug", "D", false, "启用调试模式")
+	flags.StringVarP(&commonOpts.LogLevel, "log-level", "l", "info", "设置日志级别")
+	flags.BoolVar(&commonOpts.TLS, "tls", false, "使用 TLS; 可以通过 --tlsverify 参数制定")
+	flags.BoolVar(&commonOpts.TLSVerify, FlagTLSVerify, dockerTLSVerify, "使用 TLS 来验证远程连接")
 
 	// TODO use flag flags.String("identity"}, "i", "", "Path to libtrust key file")
 
 	commonOpts.TLSOptions = &tlsconfig.Options{}
 	tlsOptions := commonOpts.TLSOptions
-	flags.StringVar(&tlsOptions.CAFile, "tlscacert", filepath.Join(dockerCertPath, DefaultCaFile), "Trust certs signed only by this CA")
-	flags.StringVar(&tlsOptions.CertFile, "tlscert", filepath.Join(dockerCertPath, DefaultCertFile), "Path to TLS certificate file")
-	flags.StringVar(&tlsOptions.KeyFile, "tlskey", filepath.Join(dockerCertPath, DefaultKeyFile), "Path to TLS key file")
+	flags.StringVar(&tlsOptions.CAFile, "tlscacert", filepath.Join(dockerCertPath, DefaultCaFile), "只通过此CA受信的cert")
+	flags.StringVar(&tlsOptions.CertFile, "tlscert", filepath.Join(dockerCertPath, DefaultCertFile), "TLS 证书文件路径")
+	flags.StringVar(&tlsOptions.KeyFile, "tlskey", filepath.Join(dockerCertPath, DefaultKeyFile), "TLS 密钥文件路径")
 
 	hostOpt := opts.NewNamedListOptsRef("hosts", &commonOpts.Hosts, opts.ValidateHost)
-	flags.VarP(hostOpt, "host", "H", "Daemon socket(s) to connect to")
+	flags.VarP(hostOpt, "host", "H", "Docker引擎监听的套接字")
 }
 
 // SetDefaultOptions sets default values for options after flag parsing is
@@ -107,7 +107,7 @@ func SetDaemonLogLevel(logLevel string) {
 	if logLevel != "" {
 		lvl, err := logrus.ParseLevel(logLevel)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to parse logging level: %s\n", logLevel)
+			fmt.Fprintf(os.Stderr, "不能解析日志级别: %s\n", logLevel)
 			os.Exit(1)
 		}
 		logrus.SetLevel(lvl)

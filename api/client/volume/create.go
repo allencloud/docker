@@ -27,13 +27,13 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create [OPTIONS] [VOLUME]",
-		Short: "Create a volume",
+		Short: "创建一个数据存储卷",
 		Long:  createDescription,
 		Args:  cli.RequiresMaxArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 1 {
 				if opts.name != "" {
-					fmt.Fprint(dockerCli.Err(), "Conflicting options: either specify --name or provide positional arg, not both\n")
+					fmt.Fprint(dockerCli.Err(), "选项冲突: 指定 --name 或者 提供 arg, 请不要两者都提供\n")
 					return cli.StatusError{StatusCode: 1}
 				}
 				opts.name = args[0]
@@ -42,11 +42,11 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.driver, "driver", "d", "local", "Specify volume driver name")
-	flags.StringVar(&opts.name, "name", "", "Specify volume name")
+	flags.StringVarP(&opts.driver, "driver", "d", "local", "指定存储驱动的名称")
+	flags.StringVar(&opts.name, "name", "", "指定存储卷的名称")
 	flags.Lookup("name").Hidden = true
-	flags.VarP(&opts.driverOpts, "opt", "o", "Set driver specific options")
-	flags.StringSliceVar(&opts.labels, "label", []string{}, "Set metadata for a volume")
+	flags.VarP(&opts.driverOpts, "opt", "o", "设置驱动的指定参数")
+	flags.StringSliceVar(&opts.labels, "label", []string{}, "为一个存储卷设置元数据")
 
 	return cmd
 }

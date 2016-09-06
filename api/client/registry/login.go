@@ -23,8 +23,8 @@ func NewLoginCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "login [OPTIONS] [SERVER]",
-		Short: "Log in to a Docker registry.",
-		Long:  "Log in to a Docker registry.\nIf no server is specified, the default is defined by the daemon.",
+		Short: "登陆一个Docker镜像仓库.",
+		Long:  "登陆一个Docker镜像仓库.\n如果没有制定服务器, Docker引擎会采用默认地址.",
 		Args:  cli.RequiresMaxArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
@@ -71,7 +71,7 @@ func runLogin(dockerCli *client.DockerCli, opts loginOptions) error {
 		authConfig.IdentityToken = response.IdentityToken
 	}
 	if err := client.StoreCredentials(dockerCli.ConfigFile(), authConfig); err != nil {
-		return fmt.Errorf("Error saving credentials: %v", err)
+		return fmt.Errorf("保存认证信息失败: %v", err)
 	}
 
 	if response.Status != "" {

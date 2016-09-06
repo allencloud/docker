@@ -53,7 +53,7 @@ func (d *Daemon) getExecConfig(name string) (*exec.Config, error) {
 	if ec != nil {
 		if container := d.containers.Get(ec.ContainerID); container != nil {
 			if !container.IsRunning() {
-				return nil, fmt.Errorf("Container %s is not running: %s", container.ID, container.State.String())
+				return nil, fmt.Errorf("容器 %s 不处于运行状态: %s", container.ID, container.State.String())
 			}
 			if container.IsPaused() {
 				return nil, errExecPaused(container.ID)
@@ -105,7 +105,7 @@ func (d *Daemon) ContainerExecCreate(name string, config *types.ExecConfig) (str
 	if config.DetachKeys != "" {
 		keys, err = term.ToBytes(config.DetachKeys)
 		if err != nil {
-			err = fmt.Errorf("Invalid escape keys (%s) provided", config.DetachKeys)
+			err = fmt.Errorf("无效的退出按键设定(%s)", config.DetachKeys)
 			return "", err
 		}
 	}
@@ -149,13 +149,13 @@ func (d *Daemon) ContainerExecStart(ctx context.Context, name string, stdin io.R
 	ec.Lock()
 	if ec.ExitCode != nil {
 		ec.Unlock()
-		err := fmt.Errorf("Error: Exec command %s has already run", ec.ID)
+		err := fmt.Errorf("错误: 执行命令 %s 已经运行", ec.ID)
 		return errors.NewRequestConflictError(err)
 	}
 
 	if ec.Running {
 		ec.Unlock()
-		return fmt.Errorf("Error: Exec command %s is already running", ec.ID)
+		return fmt.Errorf("错误: 执行命令 %s 已经运行", ec.ID)
 	}
 	ec.Running = true
 	defer func() {
@@ -223,7 +223,7 @@ func (d *Daemon) ContainerExecStart(ctx context.Context, name string, stdin io.R
 	case err := <-attachErr:
 		if err != nil {
 			if _, ok := err.(container.DetachError); !ok {
-				return fmt.Errorf("exec attach failed with error: %v", err)
+				return fmt.Errorf("执行附件出错，错误: %v", err)
 			}
 			d.LogContainerEvent(c, "exec_detach")
 		}

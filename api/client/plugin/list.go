@@ -23,7 +23,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "ls [OPTIONS]",
-		Short:   "List plugins",
+		Short:   "罗列所有插件",
 		Aliases: []string{"list"},
 		Args:    cli.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -33,7 +33,7 @@ func newListCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	flags := cmd.Flags()
 
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Don't truncate output")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断输出内容")
 
 	return cmd
 }
@@ -45,7 +45,7 @@ func runList(dockerCli *client.DockerCli, opts listOptions) error {
 	}
 
 	w := tabwriter.NewWriter(dockerCli.Out(), 20, 1, 3, ' ', 0)
-	fmt.Fprintf(w, "NAME \tTAG \tDESCRIPTION\tENABLED")
+	fmt.Fprintf(w, "名称 \t标签 \t描述\t启用情况")
 	fmt.Fprintf(w, "\n")
 
 	for _, p := range plugins {

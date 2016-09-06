@@ -25,7 +25,7 @@ func newPsCommand(dockerCli *client.DockerCli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "ps [OPTIONS] SERVICE",
-		Short: "List the tasks of a service",
+		Short: "罗列一个服务内的所有任务",
 		Args:  cli.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.serviceID = args[0]
@@ -33,9 +33,9 @@ func newPsCommand(dockerCli *client.DockerCli) *cobra.Command {
 		},
 	}
 	flags := cmd.Flags()
-	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "Do not truncate output")
-	flags.BoolVar(&opts.noResolve, "no-resolve", false, "Do not map IDs to Names")
-	flags.VarP(&opts.filter, "filter", "f", "Filter output based on conditions provided")
+	flags.BoolVar(&opts.noTrunc, "no-trunc", false, "不截断命令输出")
+	flags.BoolVar(&opts.noResolve, "no-resolve", false, "不将ID解析成名称")
+	flags.VarP(&opts.filter, "filter", "f", "基于指定条件过滤命令输出内容。")
 
 	return cmd
 }
