@@ -722,10 +722,10 @@ func (f *FlagSet) setFlag(flag *Flag, value string, origArg string) error {
 	f.actual[f.normalizeFlagName(flag.Name)] = flag
 	flag.Changed = true
 	if len(flag.Deprecated) > 0 {
-		fmt.Fprintf(os.Stderr, "Flag --%s has been deprecated, %s\n", flag.Name, flag.Deprecated)
+		fmt.Fprintf(os.Stderr, "命令参数 --%s 已经被废弃, %s\n", flag.Name, flag.Deprecated)
 	}
 	if len(flag.ShorthandDeprecated) > 0 && containsShorthand(origArg, flag.Shorthand) {
-		fmt.Fprintf(os.Stderr, "Flag shorthand -%s has been deprecated, %s\n", flag.Shorthand, flag.ShorthandDeprecated)
+		fmt.Fprintf(os.Stderr, "命令参数缩称 -%s 已经被废弃, %s\n", flag.Shorthand, flag.ShorthandDeprecated)
 	}
 	return nil
 }
@@ -770,7 +770,7 @@ func (f *FlagSet) parseLongArg(s string, args []string) (a []string, err error) 
 		a = a[1:]
 	} else {
 		// '--flag' (arg was required)
-		err = f.failf("flag needs an argument: %s", s)
+		err = f.failf("命令行需要一个参数: %s", s)
 		return
 	}
 	err = f.setFlag(flag, value, s)
