@@ -400,6 +400,8 @@ type serviceOptions struct {
 	user            string
 	mounts          MountOpt
 
+	devices		opts.ListOpts
+
 	resources resourceOptions
 	stopGrace DurationOpt
 
@@ -426,6 +428,7 @@ func newServiceOptions() *serviceOptions {
 			ports: opts.NewListOpts(ValidatePort),
 		},
 		logDriver: newLogDriverOptions(),
+		devices:	 opts.NewListOpts(nil),
 	}
 }
 
@@ -446,6 +449,7 @@ func (opts *serviceOptions) ToService() (swarm.ServiceSpec, error) {
 				Dir:             opts.workdir,
 				User:            opts.user,
 				Mounts:          opts.mounts.Value(),
+				Devices:	 opts.devices.GetAll(),
 				StopGracePeriod: opts.stopGrace.Value(),
 			},
 			Resources:     opts.resources.ToResourceRequirements(),
@@ -523,6 +527,7 @@ const (
 	flagContainerLabel       = "container-label"
 	flagContainerLabelRemove = "container-label-rm"
 	flagContainerLabelAdd    = "container-label-add"
+	flagDevices		 = "devices"
 	flagEndpointMode         = "endpoint-mode"
 	flagEnv                  = "env"
 	flagEnvRemove            = "env-rm"

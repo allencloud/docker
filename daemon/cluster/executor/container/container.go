@@ -272,8 +272,20 @@ func getMountMask(m *api.Mount) string {
 }
 
 func (c *containerConfig) hostConfig() *enginecontainer.HostConfig {
+	res := c.resources()
+	
+	deviceMappings := []enginecontainer.DeviceMapping{}
+	for _, device := range c.spec().Devices {
+		deviceMapping, err := ParseDevice(device)
+		if err != nil {
+			continue
+		}
+		deviceMappings = append(deviceMappings, deviceMapping)
+	}
+
+	res.Devices = deviceMappings
 	hc := &enginecontainer.HostConfig{
-		Resources: c.resources(),
+		Resources: res,
 		Binds:     c.binds(),
 		Tmpfs:     c.tmpfs(),
 	}
@@ -284,6 +296,8 @@ func (c *containerConfig) hostConfig() *enginecontainer.HostConfig {
 			Config: c.task.LogDriver.Options,
 		}
 	}
+
+	hc.Privileged = true
 
 	return hc
 }
@@ -505,4 +519,56 @@ func (c containerConfig) eventFilter() filters.Args {
 	filter.Add("name", c.name())
 	filter.Add("label", fmt.Sprintf("%v.task.id=%v", systemLabelPrefix, c.task.ID))
 	return filter
+}
+
+func ParseDevice(device string) (enginecontainer.DeviceMapping, error) {
+	src := ""
+	dst := ""
+	permissions := "rwm"
+	arr := strings.Split(device, ":")
+	switch len(arr) {
+	case 3:
+		permissions = arr[2]
+		fallthrough
+	case 2:
+		if ValidDeviceMode(arr[1]) {
+			permissions = arr[1]
+		} else {
+			dst = arr[1]
+		}
+		fallthrough
+	case 1:
+		src = arr[0]
+	default:
+		return enginecontainer.DeviceMapping{}, fmt.Errorf("invalid device specification: %s", device)
+	}
+
+	if dst == "" {
+		dst = src
+	}
+
+	deviceMapping := enginecontainer.DeviceMapping{
+		PathOnHost:        src,
+		PathInContainer:   dst,
+		CgroupPermissions: permissions,
+	}
+	return deviceMapping, nil
+}
+
+func ValidDeviceMode(mode string) bool {
+	var legalDeviceMode = map[rune]bool{
+		'r': true,
+		'w': true,
+		'm': true,
+	}
+	if mode == "" {
+		return false
+	}
+	for _, c := range mode {
+		if !legalDeviceMode[c] {
+			return false
+		}
+		legalDeviceMode[c] = false
+	}
+	return true
 }

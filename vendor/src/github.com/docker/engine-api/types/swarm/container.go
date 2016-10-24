@@ -13,6 +13,7 @@ type ContainerSpec struct {
 	User            string            `json:",omitempty"`
 	Mounts          []Mount           `json:",omitempty"`
 	StopGracePeriod *time.Duration    `json:",omitempty"`
+	Devices		[]string	  `json:",omitempty"`
 }
 
 // MountType represents the type of a mount.

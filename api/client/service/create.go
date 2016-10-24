@@ -36,6 +36,7 @@ func newCreateCommand(dockerCli *client.DockerCli) *cobra.Command {
 	flags.StringSliceVar(&opts.constraints, flagConstraint, []string{}, "Placement constraints")
 	flags.StringSliceVar(&opts.networks, flagNetwork, []string{}, "Network attachments")
 	flags.VarP(&opts.endpoint.ports, flagPublish, "p", "Publish a port as a node port")
+	flags.Var(&opts.devices, flagDevices, "Set user-defined device")
 
 	flags.SetInterspersed(false)
 	return cmd

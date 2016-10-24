@@ -179,6 +179,9 @@ message ContainerSpec {
 
 	// PullOptions parameterize the behavior of image pulls.
 	PullOptions pull_options = 10;
+	
+	// devices specifies the devices used by the service.
+	repeated string devices = 11;
 }
 
 // EndpointSpec defines the properties that can be configured to
