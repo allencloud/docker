@@ -50,6 +50,7 @@ func presentInHelp(usage string) string { return usage }
 func absentFromHelp(string) string      { return "" }
 
 // NewDaemonCli returns a pre-configured daemon CLI
+// 为一个daemon配置了非常多的flag参数
 func NewDaemonCli() *DaemonCli {
 	daemonFlags := cli.Subcmd("daemon", nil, "Enable daemon mode", true)
 
@@ -131,6 +132,7 @@ func getGlobalFlag() (globalFlag *flag.Flag) {
 }
 
 // CmdDaemon is the daemon command, called the raw arguments after `docker daemon`.
+// 说明启动命令的形式为docker daemon ..., 代表需要启动docker daemon
 func (cli *DaemonCli) CmdDaemon(args ...string) error {
 	// warn from uuid package when running the daemon
 	uuid.Loggerf = logrus.Warnf
@@ -238,6 +240,8 @@ func (cli *DaemonCli) CmdDaemon(args ...string) error {
 		serverConfig.Addrs = append(serverConfig.Addrs, apiserver.Addr{Proto: protoAddrParts[0], Addr: protoAddrParts[1]})
 	}
 
+	// 在这之前，基本都是属于在处理daemon所需要的配置信息
+	// 开始创建daemon层面的Server对象
 	api, err := apiserver.New(serverConfig)
 	if err != nil {
 		logrus.Fatal(err)
@@ -248,7 +252,10 @@ func (cli *DaemonCli) CmdDaemon(args ...string) error {
 	}
 	cli.TrustKeyPath = commonFlags.TrustKey
 
+	// 通过用户指定的镜像仓库参数，来生成对象 registryService，初始化daemon时需要此参数
 	registryService := registry.NewService(cli.registryOptions)
+
+	// 这里非常重要，开始创建docker daemon的核心数据结构 Daemon
 	d, err := daemon.NewDaemon(cli.Config, registryService)
 	if err != nil {
 		if pfile != nil {
@@ -268,8 +275,11 @@ func (cli *DaemonCli) CmdDaemon(args ...string) error {
 		"graphdriver": d.GraphDriverName(),
 	}).Info("Docker daemon")
 
+	// 开始为docker daemon定义api路由列表
+	// 也就是注册API
 	api.InitRouters(d)
 
+	// 定义一个reload函数, 支持docker daemon的配置可以动态加载
 	reload := func(config *daemon.Config) {
 		if err := d.Reload(config); err != nil {
 			logrus.Errorf("Error reconfiguring the daemon: %v", err)
@@ -278,12 +288,18 @@ func (cli *DaemonCli) CmdDaemon(args ...string) error {
 		api.Reload(config)
 	}
 
+	// 设置配置重新加载的信号捕捉处理，也就是说当docker daemon
+	// 接收到HUP信号时，可以执行reload函数
+	// 一般的用法是：1.找到docker daemon的pid号，ps aux | grep docker
+	//             2.kill -HUP pid
 	setupConfigReloadTrap(*configFile, cli.flags, reload)
 
 	// The serve API routine never exits unless an error occurs
 	// We need to start it as a goroutine and wait on it so
 	// daemon doesn't exit
 	serveAPIWait := make(chan error)
+
+	// 开启一个goroutine来
 	go api.Wait(serveAPIWait)
 
 	signal.Trap(func() {

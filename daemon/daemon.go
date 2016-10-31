@@ -102,34 +102,34 @@ func (e ErrImageDoesNotExist) Error() string {
 
 // Daemon holds information about the Docker daemon.
 type Daemon struct {
-	ID                        string
-	repository                string
-	containers                container.Store
-	execCommands              *exec.Store
-	referenceStore            reference.Store
-	downloadManager           *xfer.LayerDownloadManager
-	uploadManager             *xfer.LayerUploadManager
-	distributionMetadataStore dmetadata.Store
-	trustKey                  libtrust.PrivateKey
-	idIndex                   *truncindex.TruncIndex
-	configStore               *Config
-	execDriver                execdriver.Driver
-	statsCollector            *statsCollector
-	defaultLogConfig          containertypes.LogConfig
-	RegistryService           *registry.Service
-	EventsService             *events.Events
-	netController             libnetwork.NetworkController
-	volumes                   *store.VolumeStore
-	discoveryWatcher          discoveryReloader
-	root                      string
-	seccompEnabled            bool
-	shutdown                  bool
-	uidMaps                   []idtools.IDMap
-	gidMaps                   []idtools.IDMap
-	layerStore                layer.Store
-	imageStore                image.Store
-	nameIndex                 *registrar.Registrar
-	linkIndex                 *linkIndex
+	ID                        string                       //
+	repository                string                       // Docker daemon对于镜像在磁盘上存储文件的路径
+	containers                container.Store              // 存储所有容器对象的数据结构
+	execCommands              *exec.Store                  //
+	referenceStore            reference.Store              //
+	downloadManager           *xfer.LayerDownloadManager   // 镜像层下载管理器
+	uploadManager             *xfer.LayerUploadManager     // 镜像层上传管理器
+	distributionMetadataStore dmetadata.Store              // distribution的元数据存储区域
+	trustKey                  libtrust.PrivateKey          //
+	idIndex                   *truncindex.TruncIndex       // docker对于容器、网络等的前缀索引
+	configStore               *Config                      // daemon的配置型
+	execDriver                execdriver.Driver            //
+	statsCollector            *statsCollector              // 容器状态、资源使用等的收集器
+	defaultLogConfig          containertypes.LogConfig     // 容器的默认日志配置
+	RegistryService           *registry.Service            // docker daemon的镜像仓库配置
+	EventsService             *events.Events               //
+	netController             libnetwork.NetworkController // 网络控制器，指向libnetwork的核心控制模块
+	volumes                   *store.VolumeStore           // 数据卷volume的存储区域
+	discoveryWatcher          discoveryReloader            //
+	root                      string                       // docker的根目录，一般默认为/var/lib/docker
+	seccompEnabled            bool                         // 是否启用seccomp
+	shutdown                  bool                         //
+	uidMaps                   []idtools.IDMap              //
+	gidMaps                   []idtools.IDMap              //
+	layerStore                layer.Store                  //
+	imageStore                image.Store                  //
+	nameIndex                 *registrar.Registrar         //
+	linkIndex                 *linkIndex                   //
 }
 
 // GetContainer looks for a container using the provided information, which could be
@@ -251,6 +251,9 @@ func (daemon *Daemon) Register(container *container.Container) error {
 	return nil
 }
 
+// 对于每个容器，元数据信息，docker daemon都会将其持久化到本地磁盘上，
+// 当docker重启之后，daemon需要从磁盘上重新加载这部分信息，将容器启动起来，
+// 即调用restore函数
 func (daemon *Daemon) restore() error {
 	var (
 		debug         = utils.IsDebugEnabled()
@@ -590,17 +593,23 @@ func (daemon *Daemon) registerLink(parent, child *container.Container, alias str
 	return nil
 }
 
+// 这是极其重要的函数，创建最重要的Daemon对象，Daemon对象中包罗万象
+// 所有需要被Docker Daemon管理的内容都在Daemon对象中
 // NewDaemon sets up everything for the daemon to be able to service
 // requests from the webserver.
 func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemon, err error) {
 	setDefaultMtu(config)
 
 	// Ensure we have compatible and valid configuration options
+	// 生成docker daemon的很多内部属性，都要通过用户传入的配置来完成
+	// 首先需要验证用户输入配置信息的合法性
 	if err := verifyDaemonSettings(config); err != nil {
 		return nil, err
 	}
 
 	// Do we have a disabled network?
+	// 看看用户为bridge是否设置了none模式的网桥？
+	// 默认情况下不会
 	config.DisableBridge = isBridgeNetworkDisabled(config)
 
 	// Verify the platform is supported as a daemon
@@ -609,6 +618,8 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 	}
 
 	// Validate platform-specific requirements
+	// 验证docker daemon的系统运行环境是否满足需求，比如Linux系统上，必须要root用户运行，
+	// 比如windows机器上，必须运行在windows server 2016等版本上
 	if err := checkSystem(); err != nil {
 		return nil, err
 	}
@@ -621,6 +632,7 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 	if err != nil {
 		return nil, err
 	}
+	// 获取docker daemon在运行时的用户ID，组ID
 	rootUID, rootGID, err := idtools.GetRootUIDGID(uidMaps, gidMaps)
 	if err != nil {
 		return nil, err
@@ -628,6 +640,7 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 
 	// get the canonical path to the Docker root directory
 	var realRoot string
+	// 查看配置中docker的根目录是否存在，如果不存在，将配置中的值赋给realRoot
 	if _, err := os.Stat(config.Root); err != nil && os.IsNotExist(err) {
 		realRoot = config.Root
 	} else {
@@ -637,6 +650,7 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 		}
 	}
 
+	// 为docker daemon设置root根目录
 	if err = setupDaemonRoot(config, realRoot, rootUID, rootGID); err != nil {
 		return nil, err
 	}
@@ -655,6 +669,7 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 	d := &Daemon{}
 	// Ensure the daemon is properly shutdown if there is a failure during
 	// initialization
+	// 只要在初始化阶段出现任何错误，defer保证会执行docker daemon的Shutdown操作
 	defer func() {
 		if err != nil {
 			if err := d.Shutdown(); err != nil {
@@ -664,6 +679,7 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 	}()
 
 	// Verify logging driver type
+	// 验证docker daemon为容器设置的日志配置信息
 	if config.LogConfig.Type != "none" {
 		if _, err := logger.GetLogDriver(config.LogConfig.Type); err != nil {
 			return nil, fmt.Errorf("error finding the logging driver: %v", err)
@@ -671,15 +687,22 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 	}
 	logrus.Debugf("Using default logging driver %s", config.LogConfig.Type)
 
+	// 创建（默认） /var/lib/docker/containers目录，这个目录非常重要
+	// 这个目录中会存储每个容器的元数据信息，以及日志文件，hosts文件，resolv.conf文件等
 	daemonRepo := filepath.Join(config.Root, "containers")
 	if err := idtools.MkdirAllAs(daemonRepo, 0700, rootUID, rootGID); err != nil && !os.IsExist(err) {
 		return nil, err
 	}
 
+	// 开始设置存储镜像的graphdriver
+	// 第一选项为从环境变量总读取 DOCKER_DRIVER
 	driverName := os.Getenv("DOCKER_DRIVER")
 	if driverName == "" {
 		driverName = config.GraphDriver
 	}
+
+	// layerStore主要用于存储镜像，更为细致时存储镜像中的每一层layer
+	// 开始根据镜像存储驱动类型，开始新建layerStore实例
 	d.layerStore, err = layer.NewStoreFromOptions(layer.StoreOptions{
 		StorePath:                 config.Root,
 		MetadataStorePathTemplate: filepath.Join(config.Root, "image", "%s", "layerdb"),
@@ -692,7 +715,9 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 		return nil, err
 	}
 
+	// 新建完layerStore之后，才有真实的graphdriver，获取该驱动的名称
 	graphDriver := d.layerStore.DriverName()
+	// 根据驱动的名称，创建镜像存储的根目录
 	imageRoot := filepath.Join(config.Root, "image", graphDriver)
 
 	// Configure and validate the kernels security support
@@ -708,12 +733,15 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 		return nil, err
 	}
 
+	// 注意imageStore和layerStore的区别
 	d.imageStore, err = image.NewImageStore(ifs, d.layerStore)
 	if err != nil {
 		return nil, err
 	}
 
 	// Configure the volumes driver
+	// 配置数据卷存储启动，这一块的实现目前，甚至是1.12中实现都比较初级，
+	// 所以docker要很好的实现结合存储，还有一段距离要走
 	volStore, err := configureVolumes(config, rootUID, rootGID)
 	if err != nil {
 		return nil, err
@@ -758,6 +786,8 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 		return nil, err
 	}
 
+	// 新建一个网络控制器，这部分的内容全部由docker的libnetwork来完成
+	// 具体的实现都在libnetwork中
 	d.netController, err = d.initNetworkController(config)
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing network controller: %v", err)
@@ -770,6 +800,8 @@ func NewDaemon(config *Config, registryService *registry.Service) (daemon *Daemo
 		return nil, fmt.Errorf("Devices cgroup isn't mounted")
 	}
 
+	// 新建一个针对容器创建的执行驱动，包括native和windows
+	// 其中native驱动是通过OCI中的runc来完成对Linux Kernel Cgroup和Namespace的调用的
 	ed, err := execdrivers.NewDriver(config.ExecOptions, config.ExecRoot, config.Root, sysInfo)
 	if err != nil {
 		return nil, err

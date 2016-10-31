@@ -51,12 +51,15 @@ func (cli *Cli) command(args ...string) (func(...string) error, error) {
 			continue
 		}
 		camelArgs := make([]string, len(args))
+		// 举例说明，camelArgs的长度为1， 第一个元素为 "info"
 		for i, s := range args {
 			if len(s) == 0 {
 				return nil, errors.New("empty command")
 			}
+			// camelArgs[0] = Info
 			camelArgs[i] = strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
 		}
+		// methodName = CmdInfo, 该函数的定义就可以找到在info.go中了
 		methodName := "Cmd" + strings.Join(camelArgs, "")
 		method := reflect.ValueOf(c).MethodByName(methodName)
 		if method.IsValid() {
@@ -65,6 +68,7 @@ func (cli *Cli) command(args ...string) (func(...string) error, error) {
 					return nil, initErr{err}
 				}
 			}
+			// 返回值的第一个为“一个方法”，传入的参数为变长字符串，方法返回值为error
 			return method.Interface().(func(...string) error), nil
 		}
 	}
@@ -83,9 +87,13 @@ func (cli *Cli) Run(args ...string) error {
 		}
 	}
 	if len(args) > 0 {
+		// 如果参数数量为1, 比如docker info
+		// args[0] = "info", 将该值作为参数传给command方法
+		// 返回的command为一个方法CmdInfo
 		command, err := cli.command(args[0])
 		switch err := err.(type) {
 		case nil:
+			// 这里就正式运行方法CmdInfo啦，没有参数，进入/api/client/info.go进行分析
 			return command(args[1:]...)
 		case initErr:
 			return err.error

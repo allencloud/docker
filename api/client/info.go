@@ -19,6 +19,8 @@ func (cli *DockerCli) CmdInfo(args ...string) error {
 
 	cmd.ParseFlags(args, true)
 
+	// 这里开始调用docker daemon的remote api
+	// docker daemon的返回值，都在对象info中，后续的解析与显示，都通过info来完成
 	info, err := cli.client.Info()
 	if err != nil {
 		return err

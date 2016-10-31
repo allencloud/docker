@@ -42,7 +42,7 @@ type Config struct {
 // Server contains instance details for the server
 type Server struct {
 	cfg           *Config
-	servers       []*HTTPServer
+	servers       []*HTTPServer // Server对象可以有多个HTTP的底层server，针对不同的模式，socket或tcp
 	routers       []router.Router
 	authZPlugins  []authorization.Plugin
 	routerSwapper *routerSwapper
@@ -86,11 +86,13 @@ func (s *Server) serveAPI() error {
 	s.initRouterSwapper()
 
 	var chErrors = make(chan error, len(s.servers))
+	// 针对多个不同的server，不论socket还是tcp，都要开启goroutine，开始服务于外界请求
 	for _, srv := range s.servers {
 		srv.srv.Handler = s.routerSwapper
 		go func(srv *HTTPServer) {
 			var err error
 			logrus.Infof("API listen on %s", srv.l.Addr())
+			// 开始服务于请求，只有报错的时候，才会返回err
 			if err = srv.Serve(); err != nil && strings.Contains(err.Error(), "use of closed network connection") {
 				err = nil
 			}
@@ -117,6 +119,7 @@ type HTTPServer struct {
 }
 
 // Serve starts listening for inbound requests.
+// http 底层的请求服务函数
 func (s *HTTPServer) Serve() error {
 	return s.srv.Serve(s.l)
 }
@@ -174,6 +177,9 @@ func (s *Server) makeHTTPHandler(handler httputils.APIFunc) http.HandlerFunc {
 }
 
 // InitRouters initializes a list of routers for the server.
+// 可见，docker daemon有6个方案的API
+// 分别是 容器container，网络network，系统system，存储volume，构建build，以及local等其他路由
+// 最终的结果是所有的路由纪录都在Server类型实例s中
 func (s *Server) InitRouters(d *daemon.Daemon) {
 	s.addRouter(container.NewRouter(d))
 	s.addRouter(local.NewRouter(d))
@@ -213,6 +219,7 @@ func (s *Server) createMux() *mux.Router {
 // Wait blocks the server goroutine until it exits.
 // It sends an error message if there is any error during
 // the API execution.
+// serveAPI 开始真正的服务于api，也就是说开始接受外部请求
 func (s *Server) Wait(waitChan chan error) {
 	if err := s.serveAPI(); err != nil {
 		logrus.Errorf("ServeAPI error: %v", err)
