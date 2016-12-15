@@ -102,22 +102,22 @@ func (e ErrImageDoesNotExist) Error() string {
 
 // Daemon holds information about the Docker daemon.
 type Daemon struct {
-	ID                        string                       //
-	repository                string                       // Docker daemon对于镜像在磁盘上存储文件的路径
+	ID                        string                       // 每一个daemon都有自身唯一的ID，一旦重复，可能出现集群冲突
+	repository                string                       // Docker daemon对于镜像在磁盘上存储文件的路径，有可能该文件很大，导致加载出问题，磁盘不足时也会导致daemon失效
 	containers                container.Store              // 存储所有容器对象的数据结构
-	execCommands              *exec.Store                  //
-	referenceStore            reference.Store              //
+	execCommands              *exec.Store                  // 用户每建立一个exec操作，都会被记录
+	referenceStore            reference.Store              // 关于镜像的引用列表，相当于将镜像信息存内存中，加缓存机制，加速对镜像的获取
 	downloadManager           *xfer.LayerDownloadManager   // 镜像层下载管理器
 	uploadManager             *xfer.LayerUploadManager     // 镜像层上传管理器
 	distributionMetadataStore dmetadata.Store              // distribution的元数据存储区域
 	trustKey                  libtrust.PrivateKey          //
 	idIndex                   *truncindex.TruncIndex       // docker对于容器、网络等的前缀索引
-	configStore               *Config                      // daemon的配置型
-	execDriver                execdriver.Driver            //
+	configStore               *Config                      // daemon的配置项
+	execDriver                execdriver.Driver            // 底层容器的管理驱动，
 	statsCollector            *statsCollector              // 容器状态、资源使用等的收集器
 	defaultLogConfig          containertypes.LogConfig     // 容器的默认日志配置
 	RegistryService           *registry.Service            // docker daemon的镜像仓库配置
-	EventsService             *events.Events               //
+	EventsService             *events.Events               // daemon提供的事件机制
 	netController             libnetwork.NetworkController // 网络控制器，指向libnetwork的核心控制模块
 	volumes                   *store.VolumeStore           // 数据卷volume的存储区域
 	discoveryWatcher          discoveryReloader            //
