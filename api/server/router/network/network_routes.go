@@ -104,6 +104,12 @@ func (n *networkRouter) postNetworkCreate(ctx context.Context, w http.ResponseWr
 		if _, ok := err.(libnetwork.ManagerRedirectError); !ok {
 			return err
 		}
+
+		// network name has already been taken
+		if _, ok := err.(libnetwork.NetworkNameError); !ok {
+			return err
+		}
+
 		id, err := n.cluster.CreateNetwork(create)
 		if err != nil {
 			return err
