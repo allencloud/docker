@@ -106,15 +106,19 @@ func (n *networkRouter) postNetworkCreate(ctx context.Context, w http.ResponseWr
 		}
 
 		// network name has already been taken
+		var warning string
 		if _, ok := err.(libnetwork.NetworkNameError); !ok {
-			return err
+			warning = libnetwork.NetworkNameError(create.Name).Error()
 		}
 
 		id, err := n.cluster.CreateNetwork(create)
 		if err != nil {
 			return err
 		}
-		nw = &types.NetworkCreateResponse{ID: id}
+		nw = &types.NetworkCreateResponse{
+			ID:      id,
+			Warning: warning,
+		}
 	}
 
 	return httputils.WriteJSON(w, http.StatusCreated, nw)
