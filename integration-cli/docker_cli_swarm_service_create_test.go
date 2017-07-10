@@ -5,6 +5,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -12,6 +14,9 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/integration-cli/checker"
+	"github.com/docker/docker/integration-cli/cli"
+	"github.com/docker/docker/pkg/testutil"
+	icmd "github.com/docker/docker/pkg/testutil/cmd"
 	"github.com/go-check/check"
 )
 
@@ -444,4 +449,228 @@ func (s *DockerSwarmSuite) TestServiceCreateWithNetworkAlias(c *check.C) {
 	c.Assert(aliases, checker.HasLen, 1)
 
 	c.Assert(task.Status.ContainerStatus.ContainerID, checker.Contains, aliases[0])
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithTemplatingHostname(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	out, err := d.Cmd("service", "create", "--no-resolve-image", "--name", "test", "--hostname", "{{.Service.Name}}-{{.Task.Slot}}", "busybox", "top")
+	c.Assert(err, checker.IsNil, check.Commentf(out))
+
+	// make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	containers := d.ActiveContainers()
+	out, err = d.Cmd("inspect", "--type", "container", "--format", "{{.Config.Hostname}}", containers[0])
+	c.Assert(err, checker.IsNil, check.Commentf(out))
+	c.Assert(strings.Split(out, "\n")[0], checker.Equals, "test-1", check.Commentf("hostname with templating invalid"))
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithGroup(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	name := "top"
+	out, err := d.Cmd("service", "create", "--no-resolve-image", "--name", name, "--user", "root:root", "--group", "wheel", "--group", "audio", "--group", "staff", "--group", "777", "busybox", "top")
+	c.Assert(err, checker.IsNil)
+	c.Assert(strings.TrimSpace(out), checker.Not(checker.Equals), "")
+
+	// make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	out, err = d.Cmd("ps", "-q")
+	c.Assert(err, checker.IsNil)
+	c.Assert(strings.TrimSpace(out), checker.Not(checker.Equals), "")
+
+	container := strings.TrimSpace(out)
+
+	out, err = d.Cmd("exec", container, "id")
+	c.Assert(err, checker.IsNil)
+	c.Assert(strings.TrimSpace(out), checker.Equals, "uid=0(root) gid=0(root) groups=10(wheel),29(audio),50(staff),777")
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithNoIngressNetwork(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	// Remove ingress network
+	out, _, err := testutil.RunCommandPipelineWithOutput(
+		exec.Command("echo", "Y"),
+		exec.Command("docker", "-H", d.Sock(), "network", "rm", "ingress"),
+	)
+	c.Assert(err, checker.IsNil, check.Commentf(out))
+
+	// Create a overlay network and launch a service on it
+	// Make sure nothing panics because ingress network is missing
+	out, err = d.Cmd("network", "create", "-d", "overlay", "another-network")
+	c.Assert(err, checker.IsNil, check.Commentf(out))
+	out, err = d.Cmd("service", "create", "--no-resolve-image", "--name", "srv4", "--network", "another-network", "busybox", "top")
+	c.Assert(err, checker.IsNil, check.Commentf(out))
+}
+
+// Test case for #24712
+func (s *DockerSwarmSuite) TestServiceCreateWithEnvFile(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	path := filepath.Join(d.Folder, "env.txt")
+	err := ioutil.WriteFile(path, []byte("VAR1=A\nVAR2=A\n"), 0644)
+	c.Assert(err, checker.IsNil)
+
+	name := "worker"
+	out, err := d.Cmd("service", "create", "--no-resolve-image", "--env-file", path, "--env", "VAR1=B", "--env", "VAR1=C", "--env", "VAR2=", "--env", "VAR2", "--name", name, "busybox", "top")
+	c.Assert(err, checker.IsNil)
+	c.Assert(strings.TrimSpace(out), checker.Not(checker.Equals), "")
+
+	// The complete env is [VAR1=A VAR2=A VAR1=B VAR1=C VAR2= VAR2] and duplicates will be removed => [VAR1=C VAR2]
+	out, err = d.Cmd("inspect", "--format", "{{ .Spec.TaskTemplate.ContainerSpec.Env }}", name)
+	c.Assert(err, checker.IsNil)
+	c.Assert(out, checker.Contains, "[VAR1=C VAR2]")
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithTTY(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	name := "top"
+
+	ttyCheck := "if [ -t 0 ]; then echo TTY > /status && top; else echo none > /status && top; fi"
+
+	// Without --tty
+	expectedOutput := "none"
+	out, err := d.Cmd("service", "create", "--no-resolve-image", "--name", name, "busybox", "sh", "-c", ttyCheck)
+	c.Assert(err, checker.IsNil)
+
+	// Make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	// We need to get the container id.
+	out, err = d.Cmd("ps", "-a", "-q", "--no-trunc")
+	c.Assert(err, checker.IsNil)
+	id := strings.TrimSpace(out)
+
+	out, err = d.Cmd("exec", id, "cat", "/status")
+	c.Assert(err, checker.IsNil)
+	c.Assert(out, checker.Contains, expectedOutput, check.Commentf("Expected '%s', but got %q", expectedOutput, out))
+
+	// Remove service
+	out, err = d.Cmd("service", "rm", name)
+	c.Assert(err, checker.IsNil)
+	// Make sure container has been destroyed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 0)
+
+	// With --tty
+	expectedOutput = "TTY"
+	out, err = d.Cmd("service", "create", "--no-resolve-image", "--name", name, "--tty", "busybox", "sh", "-c", ttyCheck)
+	c.Assert(err, checker.IsNil)
+
+	// Make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	// We need to get the container id.
+	out, err = d.Cmd("ps", "-a", "-q", "--no-trunc")
+	c.Assert(err, checker.IsNil)
+	id = strings.TrimSpace(out)
+
+	out, err = d.Cmd("exec", id, "cat", "/status")
+	c.Assert(err, checker.IsNil)
+	c.Assert(out, checker.Contains, expectedOutput, check.Commentf("Expected '%s', but got %q", expectedOutput, out))
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithDNSConfig(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	// Create a service
+	name := "top"
+	_, err := d.Cmd("service", "create", "--no-resolve-image", "--name", name, "--dns=1.2.3.4", "--dns-search=example.com", "--dns-option=timeout:3", "busybox", "top")
+	c.Assert(err, checker.IsNil)
+
+	// Make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	// We need to get the container id.
+	out, err := d.Cmd("ps", "-a", "-q", "--no-trunc")
+	c.Assert(err, checker.IsNil)
+	id := strings.TrimSpace(out)
+
+	// Compare against expected output.
+	expectedOutput1 := "nameserver 1.2.3.4"
+	expectedOutput2 := "search example.com"
+	expectedOutput3 := "options timeout:3"
+	out, err = d.Cmd("exec", id, "cat", "/etc/resolv.conf")
+	c.Assert(err, checker.IsNil)
+	c.Assert(out, checker.Contains, expectedOutput1, check.Commentf("Expected '%s', but got %q", expectedOutput1, out))
+	c.Assert(out, checker.Contains, expectedOutput2, check.Commentf("Expected '%s', but got %q", expectedOutput2, out))
+	c.Assert(out, checker.Contains, expectedOutput3, check.Commentf("Expected '%s', but got %q", expectedOutput3, out))
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithExtraHosts(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	// Create a service
+	name := "top"
+	_, err := d.Cmd("service", "create", "--no-resolve-image", "--name", name, "--host=example.com:1.2.3.4", "busybox", "top")
+	c.Assert(err, checker.IsNil)
+
+	// Make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	// We need to get the container id.
+	out, err := d.Cmd("ps", "-a", "-q", "--no-trunc")
+	c.Assert(err, checker.IsNil)
+	id := strings.TrimSpace(out)
+
+	// Compare against expected output.
+	expectedOutput := "1.2.3.4\texample.com"
+	out, err = d.Cmd("exec", id, "cat", "/etc/hosts")
+	c.Assert(err, checker.IsNil)
+	c.Assert(out, checker.Contains, expectedOutput, check.Commentf("Expected '%s', but got %q", expectedOutput, out))
+}
+
+func (s *DockerTrustedSwarmSuite) TestTrustedServiceCreate(c *check.C) {
+	d := s.swarmSuite.AddDaemon(c, true, true)
+
+	// Attempt creating a service from an image that is known to notary.
+	repoName := s.trustSuite.setupTrustedImage(c, "trusted-pull")
+
+	name := "trusted"
+	cli.Docker(cli.Args("-D", "service", "create", "--no-resolve-image", "--name", name, repoName, "top"), trustedCmd, cli.Daemon(d.Daemon)).Assert(c, icmd.Expected{
+		Err: "resolved image tag to",
+	})
+
+	out, err := d.Cmd("service", "inspect", "--pretty", name)
+	c.Assert(err, checker.IsNil, check.Commentf(out))
+	c.Assert(out, checker.Contains, repoName+"@", check.Commentf(out))
+
+	// Try trusted service create on an untrusted tag.
+
+	repoName = fmt.Sprintf("%v/untrustedservicecreate/createtest:latest", privateRegistryURL)
+	// tag the image and upload it to the private registry
+	cli.DockerCmd(c, "tag", "busybox", repoName)
+	cli.DockerCmd(c, "push", repoName)
+	cli.DockerCmd(c, "rmi", repoName)
+
+	name = "untrusted"
+	cli.Docker(cli.Args("service", "create", "--no-resolve-image", "--name", name, repoName, "top"), trustedCmd, cli.Daemon(d.Daemon)).Assert(c, icmd.Expected{
+		ExitCode: 1,
+		Err:      "Error: remote trust data does not exist",
+	})
+
+	out, err = d.Cmd("service", "inspect", "--pretty", name)
+	c.Assert(err, checker.NotNil, check.Commentf(out))
+}
+
+func (s *DockerSwarmSuite) TestServiceCreateWithPublishDuplicatePorts(c *check.C) {
+	d := s.AddDaemon(c, true, true)
+
+	out, err := d.Cmd("service", "create", "--no-resolve-image", "--detach=true", "--publish", "5005:80", "--publish", "5006:80", "--publish", "80", "--publish", "80", "busybox", "top")
+	c.Assert(err, check.IsNil, check.Commentf(out))
+	id := strings.TrimSpace(out)
+
+	// make sure task has been deployed.
+	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
+
+	// Total len = 4, with 2 dynamic ports and 2 non-dynamic ports
+	// Dynamic ports are likely to be 30000 and 30001 but doesn't matter
+	out, err = d.Cmd("service", "inspect", "--format", "{{.Endpoint.Ports}} len={{len .Endpoint.Ports}}", id)
+	c.Assert(err, check.IsNil, check.Commentf(out))
+	c.Assert(out, checker.Contains, "len=4")
+	c.Assert(out, checker.Contains, "{ tcp 80 5005 ingress}")
+	c.Assert(out, checker.Contains, "{ tcp 80 5006 ingress}")
 }
